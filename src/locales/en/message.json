@@ -1,0 +1,10 @@
+{
+  "base": {
+    "notFound": "Not found",
+    "FormatOrderIncorrect": "Format order incorrect",
+    "incorrectPhoneNumber": "Incorrect phone number",
+    "invalidFilePath": "Invalid file path",
+    "forbidden": "Forbidden",
+    "actionDenied": "You don't have permission to perform this action!"
+  }
+}
