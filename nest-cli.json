@@ -1,31 +1,31 @@
 {
   "$schema": "https://json.schemastore.org/nest-cli",
   "collection": "@nestjs/schematics",
-  "sourceRoot": "src",
   "compilerOptions": {
-    "builder": {
-      "type": "swc",
-      "options": {
-        "swcrcPath": ".swcrc.json"
-      }
-    },
-    "deleteOutDir": true,
     "assets": [
       {
         "include": "locales/**/*.json",
-        "watchAssets": true,
-        "outDir": "dist"
+        "outDir": "dist",
+        "watchAssets": true
       },
       {
         "include": "services/**/*.pug",
-        "watchAssets": true,
-        "outDir": "dist"
+        "outDir": "dist",
+        "watchAssets": true
       },
       {
         "include": "db/global-bundle.pem",
-        "watchAssets": true,
-        "outDir": "dist"
+        "outDir": "dist",
+        "watchAssets": true
       }
-    ]
-  }
+    ],
+    "builder": {
+      "options": {
+        "swcrcPath": ".swcrc.json"
+      },
+      "type": "swc"
+    },
+    "deleteOutDir": true
+  },
+  "sourceRoot": "src"
 }

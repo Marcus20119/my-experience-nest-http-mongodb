@@ -12,7 +12,8 @@
     "noImplicitThis": false,
     "outDir": "./dist",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@/common/*": ["./src/common/*"]
     },
     "resolveJsonModule": true,
     "skipLibCheck": true,

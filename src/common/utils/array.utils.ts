@@ -1,4 +1,3 @@
-/* eslint-disable sonarjs/no-alphabetical-sort */
 export const uniq = <T>(array: T[]): T[] => [...new Set(array)]
 
 export const toArray = <T>(item: T | T[]): T[] => (Array.isArray(item) ? item : [item])

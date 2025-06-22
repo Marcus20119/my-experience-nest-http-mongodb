@@ -5,7 +5,7 @@ import { DisplayName } from '@/common/interfaces'
 
 import { BaseEntity } from '../base'
 
-@Schema({ timestamps: true })
+@Schema({ collection: 'technology_sections', timestamps: true })
 export class TechnologySection extends BaseEntity {
   @Prop({
     enum: TechnologyType,
@@ -19,6 +19,11 @@ export class TechnologySection extends BaseEntity {
     type: DisplayName,
   })
   name: DisplayName
+
+  @Prop({
+    type: String,
+  })
+  slug: string
 }
 
 export const TechnologySectionSchema = SchemaFactory.createForClass(TechnologySection)

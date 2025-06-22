@@ -7,12 +7,18 @@ import { Path } from "nestjs-i18n";
 export type I18nTranslations = {
     "message": {
         "base": {
-            "notFound": string;
-            "FormatOrderIncorrect": string;
+            "actionDenied": string;
+            "forbidden": string;
+            "formatOrderIncorrect": string;
             "incorrectPhoneNumber": string;
             "invalidFilePath": string;
-            "forbidden": string;
-            "actionDenied": string;
+            "invalidIdParam": string;
+            "notFound": string;
+            "requiredIdParam": string;
+        };
+        "technologySection": {
+            "existed": string;
+            "notFound": string;
         };
     };
 };

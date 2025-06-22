@@ -71,3 +71,6 @@ vitest.config.mts.timestamp-*.mjs
 docker-compose.yml
 # Sentry Config File
 .sentryclirc
+
+# Http testing
+*.http

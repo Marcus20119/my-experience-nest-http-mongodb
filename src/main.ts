@@ -1,10 +1,10 @@
-import { Logger } from '@nestjs/common'
+import { Logger, ValidationPipe } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
 import type { NestFastifyApplication } from '@nestjs/platform-fastify'
 import { FastifyAdapter } from '@nestjs/platform-fastify'
-import { useContainer } from 'class-validator'
+import { useContainer, ValidationError } from 'class-validator'
 import { utilities as winstonUtilities, WinstonModule } from 'nest-winston'
-import { I18nValidationPipe } from 'nestjs-i18n'
+import { I18nValidationException, I18nValidationExceptionFilter } from 'nestjs-i18n'
 import * as winston from 'winston'
 
 import { API_VERSION, APP_ENV } from '@/common/constants'
@@ -39,19 +39,22 @@ async function bootstrap() {
 
   useContainer(app.select(AppModule), { fallbackOnErrors: true })
   app.useGlobalPipes(
-    new I18nValidationPipe({
+    new ValidationPipe({
       enableDebugMessages: config.app.env === APP_ENV.LOCAL,
+      exceptionFactory: (errors: ValidationError[]) => {
+        return new I18nValidationException(errors)
+      },
       transform: true,
       transformOptions: { exposeUnsetFields: false },
       whitelist: true,
     }),
   )
 
+  app.useGlobalFilters(new I18nValidationExceptionFilter())
   app.useGlobalInterceptors(new TransformInterceptor())
 
-  await app.listen(process.env.PORT ?? 3000)
+  await app.listen(config.app.port, '0.0.0.0')
 
   Logger.log(`🚀 API Server version: ${version} running on port ${config.app.port}`, 'Bootstrap')
 }
-// eslint-disable-next-line unicorn/prefer-top-level-await
 bootstrap().catch((error) => console.error(error))

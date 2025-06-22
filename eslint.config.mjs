@@ -6,6 +6,7 @@ import { FlatCompat } from '@eslint/eslintrc'
 import js from '@eslint/js'
 import typescriptEslint from '@typescript-eslint/eslint-plugin'
 import tsParser from '@typescript-eslint/parser'
+import eslintPluginJsonc from 'eslint-plugin-jsonc'
 import perfectionist from 'eslint-plugin-perfectionist'
 import prettier from 'eslint-plugin-prettier'
 import simpleImportSort from 'eslint-plugin-simple-import-sort'
@@ -13,6 +14,8 @@ import sonarjs from 'eslint-plugin-sonarjs'
 import sortDestructureKeys from 'eslint-plugin-sort-destructure-keys'
 import unicorn from 'eslint-plugin-unicorn'
 import unusedImports from 'eslint-plugin-unused-imports'
+import importPlugin from 'eslint-plugin-import'
+import jsoncParser from 'jsonc-eslint-parser'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -36,8 +39,10 @@ export default [
       'plugin:unicorn/recommended',
       'plugin:sonarjs/recommended-legacy',
     ),
-  ),
-  {
+  ).map((config) => ({
+    ...config,
+    files: ['**/*.ts'],
+    ignores: ['**/*.json'],
     languageOptions: {
       ecmaVersion: 2023,
       globals: {},
@@ -45,10 +50,8 @@ export default [
       parserOptions: {
         project: './tsconfig.json',
       },
-
       sourceType: 'module',
     },
-
     plugins: {
       '@typescript-eslint': fixupPluginRules(typescriptEslint),
       perfectionist,
@@ -58,13 +61,11 @@ export default [
       'sort-destructure-keys': sortDestructureKeys,
       unicorn: fixupPluginRules(unicorn),
       'unused-imports': unusedImports,
+      import: fixupPluginRules(importPlugin),
     },
-
     rules: {
       '@typescript-eslint/ban-types': 'off',
-
       '@typescript-eslint/no-explicit-any': 'off',
-
       '@typescript-eslint/no-unused-vars': 'off',
 
       eqeqeq: ['error', 'smart'],
@@ -86,11 +87,12 @@ export default [
           allowElseIf: false,
         },
       ],
+
       'no-nested-ternary': 'error',
-
       'no-unneeded-ternary': 'error',
-
       'object-shorthand': 'error',
+
+      /* Sort Rules */
       'perfectionist/sort-enums': [
         'error',
         {
@@ -113,6 +115,7 @@ export default [
           type: 'natural',
         },
       ],
+
       'perfectionist/sort-jsx-props': [
         'error',
         {
@@ -128,8 +131,6 @@ export default [
           type: 'natural',
         },
       ],
-
-      /* Sort Rules */
       'perfectionist/sort-objects': [
         'error',
         {
@@ -146,8 +147,8 @@ export default [
         },
       ],
       'simple-import-sort/exports': 'error',
-      'simple-import-sort/imports': 'error',
 
+      'simple-import-sort/imports': 'error',
       'sort-destructure-keys/sort-destructure-keys': [2, { caseSensitive: false }],
       'unicorn/filename-case': [
         'error',
@@ -174,7 +175,6 @@ export default [
         },
       ],
     },
-
     settings: {
       'import/parsers': {
         '@typescript-eslint/parser': ['.ts'],
@@ -186,6 +186,27 @@ export default [
           project: './tsconfig.json',
         },
       },
+    },
+  })),
+  {
+    files: ['**/*.json'],
+    languageOptions: {
+      parser: jsoncParser,
+    },
+    plugins: {
+      jsonc: fixupPluginRules(eslintPluginJsonc),
+    },
+    rules: {
+      'jsonc/sort-keys': [
+        'error',
+        'asc',
+        {
+          caseSensitive: true,
+          natural: false,
+          minKeys: 2,
+          allowLineSeparatedGroups: false,
+        },
+      ],
     },
   },
 ]

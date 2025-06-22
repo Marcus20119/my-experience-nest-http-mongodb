@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger'
 
+import { TechnologyType } from '@/common/enums'
 import { DisplayName } from '@/common/interfaces'
 import { TechnologySection } from '@/db/entities'
 
@@ -10,12 +11,19 @@ export class TechnologySectionResponse {
   id: string
 
   @ApiProperty({
+    enum: TechnologyType,
+    type: String,
+  })
+  type: string
+
+  @ApiProperty({
     type: DisplayName,
   })
   name: DisplayName
 
   constructor(technologySection: TechnologySection) {
     this.id = technologySection.id
+    this.type = technologySection.type
     this.name = technologySection.name
   }
 }

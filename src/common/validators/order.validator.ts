@@ -8,7 +8,7 @@ import { t } from '../utils'
 export class OrderValidator implements ValidatorConstraintInterface {
   validate(order: string): boolean {
     if (!(order && ORDER_PARAM_REGEX.test(order)))
-      throw new NotAcceptableException(t('message.base.FormatOrderIncorrect'))
+      throw new NotAcceptableException(t('message.base.formatOrderIncorrect'))
     return true
   }
 }
