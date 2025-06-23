@@ -5,7 +5,16 @@ import { MongooseModule } from '@nestjs/mongoose'
 
 import { APP_ENV } from '@/common/constants'
 import { config } from '@/config'
-import { TechnologySection, TechnologySectionSchema } from '@/db/entities'
+import {
+  KnowledgeGroup,
+  KnowledgeGroupSchema,
+  KnowledgeItem,
+  KnowledgeItemSchema,
+  Technology,
+  TechnologySchema,
+  TechnologySection,
+  TechnologySectionSchema,
+} from '@/db/entities'
 
 @Global()
 @Module({
@@ -21,7 +30,21 @@ import { TechnologySection, TechnologySectionSchema } from '@/db/entities'
           ? path.join(__dirname, '..', 'db', 'global-bundle.pem')
           : undefined,
     }),
-    MongooseModule.forFeature([{ name: TechnologySection.name, schema: TechnologySectionSchema }]),
+    MongooseModule.forFeature([
+      { name: TechnologySection.name, schema: TechnologySectionSchema },
+      {
+        name: Technology.name,
+        schema: TechnologySchema,
+      },
+      {
+        name: KnowledgeGroup.name,
+        schema: KnowledgeGroupSchema,
+      },
+      {
+        name: KnowledgeItem.name,
+        schema: KnowledgeItemSchema,
+      },
+    ]),
   ],
 })
 export class DatabaseModule {}

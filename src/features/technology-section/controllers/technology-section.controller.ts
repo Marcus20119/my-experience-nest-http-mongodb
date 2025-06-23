@@ -29,8 +29,8 @@ import { TechnologySectionResponse } from '../core/interfaces/technology-section
 import { DetailTechnologySectionQuery } from '../queries/detail-technology-section.query'
 import { ListTechnologySectionQueryInput } from '../queries/list-technology-section.query'
 
+@ApiTags('Technology section')
 @Controller('technology-sections')
-@ApiTags('technology-sections')
 export class TechnologySectionController {
   constructor(
     private readonly commandBus: CommandBus,

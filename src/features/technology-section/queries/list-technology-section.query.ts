@@ -40,8 +40,10 @@ export class ListTechnologySectionQueryHandler
       payload,
     )
 
+    const results = await Promise.all(items.map(async (i) => new TechnologySectionResponse(i)))
+
     return PaginationHelper.pagination({
-      items,
+      items: results,
       limit,
       offset,
       totalItems: total,

@@ -16,6 +16,18 @@ export type I18nTranslations = {
             "notFound": string;
             "requiredIdParam": string;
         };
+        "knowledgeGroup": {
+            "existed": string;
+            "notFound": string;
+        };
+        "knowledgeItem": {
+            "existed": string;
+            "notFound": string;
+        };
+        "technology": {
+            "existed": string;
+            "notFound": string;
+        };
         "technologySection": {
             "existed": string;
             "notFound": string;

@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 
 import { TechnologyType } from '@/common/enums'
-import { DisplayName } from '@/common/interfaces'
+import { BaseTechnologyResponse, DisplayName } from '@/common/interfaces'
 
 import { BaseEntity } from '../base'
 
@@ -24,6 +24,11 @@ export class TechnologySection extends BaseEntity {
     type: String,
   })
   slug: string
+
+  @Prop({
+    type: [BaseTechnologyResponse],
+  })
+  technologies: BaseTechnologyResponse[]
 }
 
 export const TechnologySectionSchema = SchemaFactory.createForClass(TechnologySection)

@@ -9,6 +9,18 @@
     "notFound": "Not found",
     "requiredIdParam": "Param id is required"
   },
+  "knowledgeGroup": {
+    "existed": "Knowledge group existed",
+    "notFound": "Knowledge group not found"
+  },
+  "knowledgeItem": {
+    "existed": "Knowledge item existed",
+    "notFound": "Knowledge item not found"
+  },
+  "technology": {
+    "existed": "Technology existed",
+    "notFound": "Technology not found"
+  },
   "technologySection": {
     "existed": "Technology section existed",
     "notFound": "Technology section not found"

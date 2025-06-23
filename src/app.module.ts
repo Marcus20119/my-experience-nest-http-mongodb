@@ -3,6 +3,7 @@ import { CqrsModule } from '@nestjs/cqrs'
 import { ScheduleModule } from '@nestjs/schedule'
 
 import { RequestContextModule } from './common/request-context'
+import { TechnologyModule } from './features/technology/technology.module'
 import { TechnologySectionModule } from './features/technology-section/technology-section.module'
 import { DatabaseModule } from './modules/database.module'
 import { LocalizationModule } from './modules/localization.module'
@@ -18,6 +19,7 @@ import { LocalizationModule } from './modules/localization.module'
 
     // Feature Modules
     TechnologySectionModule,
+    TechnologyModule,
   ],
 })
 export class AppModule {}

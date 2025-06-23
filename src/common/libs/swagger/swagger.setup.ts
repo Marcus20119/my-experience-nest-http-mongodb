@@ -3,6 +3,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 
 import { API_VERSION, APP_ENV } from '@/common/constants'
 import { config } from '@/config'
+import { TechnologyModule } from '@/features/technology/technology.module'
 import { TechnologySectionModule } from '@/features/technology-section/technology-section.module'
 
 import { version } from '../../../../package.json'
@@ -21,7 +22,7 @@ export function swaggerSetup(app: INestApplication) {
 
   const technologyDocument = SwaggerModule.createDocument(app, commonConfig, {
     ignoreGlobalPrefix: true,
-    include: [TechnologySectionModule],
+    include: [TechnologySectionModule, TechnologyModule],
   })
 
   const httpAdapter = app.getHttpAdapter()

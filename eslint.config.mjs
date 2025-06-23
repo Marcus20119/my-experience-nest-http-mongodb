@@ -146,7 +146,6 @@ export default [
           type: 'alphabetical',
         },
       ],
-      'simple-import-sort/exports': 'error',
 
       'simple-import-sort/imports': 'error',
       'sort-destructure-keys/sort-destructure-keys': [2, { caseSensitive: false }],
