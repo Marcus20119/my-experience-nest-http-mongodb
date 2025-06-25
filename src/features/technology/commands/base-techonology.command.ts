@@ -18,7 +18,7 @@ export class BaseTechnologyCommand {
       throw new BadRequestException(t('message.technologySection.notFound'))
     }
 
-    const index = section.technologies.findIndex((t) => t.id === technology._id)
+    const index = section.technologies.findIndex((t) => t.id === technology.id)
 
     const updated = new BaseTechnologyResponse(technology)
 
