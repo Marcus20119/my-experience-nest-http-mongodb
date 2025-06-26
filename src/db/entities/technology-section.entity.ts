@@ -12,7 +12,7 @@ export class TechnologySection extends BaseEntity {
     required: true,
     type: String,
   })
-  type: TechnologyType
+  technologyType: TechnologyType
 
   @Prop({
     required: true,

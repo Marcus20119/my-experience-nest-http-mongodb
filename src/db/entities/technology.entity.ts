@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 
 import { IconType, TechnologyType } from '@/common/enums'
-import { BaseKnowledgeGroupResponse, DisplayName } from '@/common/interfaces'
+import { BaseKnowledgeGroupResponse } from '@/common/interfaces'
 import { BaseKnowledgeItemResponse } from '@/common/interfaces/knowledge-item.interface'
 
 import { BaseEntity } from '../base'
@@ -10,9 +10,9 @@ import { BaseEntity } from '../base'
 export class Technology extends BaseEntity {
   @Prop({
     required: true,
-    type: DisplayName,
+    type: String,
   })
-  name: DisplayName
+  name: string
 
   @Prop({
     enum: IconType,
@@ -24,22 +24,33 @@ export class Technology extends BaseEntity {
   @Prop({
     type: String,
   })
-  iconUrl: string
+  iconUrl?: string
 
   @Prop({
     type: String,
   })
-  iconName: string
+  iconName?: string
+
+  @Prop({
+    required: true,
+    type: String,
+  })
+  color1: string
 
   @Prop({
     type: String,
   })
-  color: string
+  color2?: string
 
   @Prop({
     type: String,
   })
-  description: string
+  color3?: string
+
+  @Prop({
+    type: String,
+  })
+  description?: string
 
   @Prop({
     max: 5,
@@ -50,7 +61,7 @@ export class Technology extends BaseEntity {
       validator: (value: number) => (value * 10) % 5 === 0, // checks if it's in 0.5 step
     },
   })
-  rate: number
+  rate?: number
 
   @Prop({
     type: String,
@@ -62,19 +73,21 @@ export class Technology extends BaseEntity {
     required: true,
     type: String,
   })
-  type: TechnologyType
+  technologyType: TechnologyType
 
   @Prop({
     type: String,
   })
-  technologySectionId: string
+  technologySectionId?: string
 
   @Prop({
+    default: [],
     type: [BaseKnowledgeGroupResponse],
   })
   knowledgeGroups: BaseKnowledgeGroupResponse[]
 
   @Prop({
+    default: [],
     type: [BaseKnowledgeItemResponse],
   })
   knowledgeItems: BaseKnowledgeItemResponse[]

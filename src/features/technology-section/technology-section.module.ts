@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common'
 
-import { CreateTechnologySectionHandler } from './commands/create-technology-section.command'
-import { DeleteTechnologySectionHandler } from './commands/delete-technology-section.command'
-import { UpdateTechnologySectionHandler } from './commands/update-technology-section.command'
+import { CreateTechnologySectionCommandHandler } from './commands/create-technology-section.command'
+import { DeleteTechnologySectionCommandHandler } from './commands/delete-technology-section.command'
+import { UpdateTechnologySectionCommandHandler } from './commands/update-technology-section.command'
 import { TechnologySectionController } from './controllers/technology-section.controller'
 import { DetailTechnologySectionQueryHandler } from './queries/detail-technology-section.query'
 import { ListTechnologySectionQueryHandler } from './queries/list-technology-section.query'
@@ -12,9 +12,9 @@ import { ListTechnologySectionQueryHandler } from './queries/list-technology-sec
   providers: [
     ListTechnologySectionQueryHandler,
     DetailTechnologySectionQueryHandler,
-    CreateTechnologySectionHandler,
-    UpdateTechnologySectionHandler,
-    DeleteTechnologySectionHandler,
+    CreateTechnologySectionCommandHandler,
+    UpdateTechnologySectionCommandHandler,
+    DeleteTechnologySectionCommandHandler,
   ],
 })
 export class TechnologySectionModule {}

@@ -20,7 +20,7 @@ export class CreateTechnologySectionInput {
   })
   @IsNotEmpty()
   @IsEnum(TechnologyType)
-  type: TechnologyType
+  technologyType: TechnologyType
 
   @ApiProperty({
     type: DisplayName,
@@ -36,7 +36,7 @@ export class CreateTechnologySectionCommand {
 }
 
 @CommandHandler(CreateTechnologySectionCommand)
-export class CreateTechnologySectionHandler
+export class CreateTechnologySectionCommandHandler
   implements ICommandHandler<CreateTechnologySectionCommand>
 {
   constructor(
@@ -46,11 +46,10 @@ export class CreateTechnologySectionHandler
 
   async execute(command: CreateTechnologySectionCommand): Promise<TechnologySectionResponse> {
     const { input } = command
-    const { name, type } = input
+    const { name, technologyType } = input
 
     const existedTechnologySection = await this.technologySectionModel.findOne({
       'name.original': name.original,
-      type,
     })
 
     if (existedTechnologySection) {
@@ -60,7 +59,7 @@ export class CreateTechnologySectionHandler
     const newTechnologySection = await this.technologySectionModel.create({
       name,
       slug: convertSlug(joinDisplayName(name)),
-      type,
+      technologyType,
     })
 
     await newTechnologySection.save()

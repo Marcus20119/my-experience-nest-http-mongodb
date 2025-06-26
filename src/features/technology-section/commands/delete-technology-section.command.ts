@@ -11,7 +11,7 @@ export class DeleteTechnologySectionCommand {
 }
 
 @CommandHandler(DeleteTechnologySectionCommand)
-export class DeleteTechnologySectionHandler
+export class DeleteTechnologySectionCommandHandler
   implements ICommandHandler<DeleteTechnologySectionCommand>
 {
   constructor(

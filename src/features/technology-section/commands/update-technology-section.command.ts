@@ -1,35 +1,16 @@
 import { BadRequestException } from '@nestjs/common'
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { InjectModel } from '@nestjs/mongoose'
-import { ApiProperty } from '@nestjs/swagger'
-import { Type } from 'class-transformer'
-import { IsEnum, IsNotEmpty, ValidateNested } from 'class-validator'
+import { PartialType } from '@nestjs/swagger'
 import { Model } from 'mongoose'
 
-import { TechnologyType } from '@/common/enums'
-import { DisplayName } from '@/common/interfaces'
-import { t } from '@/common/utils'
+import { convertSlug, joinDisplayName, t } from '@/common/utils'
 import { TechnologySection } from '@/db/entities'
 
 import { TechnologySectionResponse } from '../core/interfaces/technology-section.interface'
+import { CreateTechnologySectionInput } from './create-technology-section.command'
 
-export class UpdateTechnologySectionInput {
-  @ApiProperty({
-    enum: TechnologyType,
-    type: String,
-  })
-  @IsNotEmpty()
-  @IsEnum(TechnologyType)
-  type: TechnologyType
-
-  @ApiProperty({
-    type: DisplayName,
-  })
-  @IsNotEmpty()
-  @ValidateNested()
-  @Type(() => DisplayName)
-  name: DisplayName
-}
+export class UpdateTechnologySectionInput extends PartialType(CreateTechnologySectionInput) {}
 
 export class UpdateTechnologySectionCommand {
   constructor(
@@ -39,7 +20,7 @@ export class UpdateTechnologySectionCommand {
 }
 
 @CommandHandler(UpdateTechnologySectionCommand)
-export class UpdateTechnologySectionHandler
+export class UpdateTechnologySectionCommandHandler
   implements ICommandHandler<UpdateTechnologySectionCommand>
 {
   constructor(
@@ -49,20 +30,26 @@ export class UpdateTechnologySectionHandler
 
   async execute(command: UpdateTechnologySectionCommand): Promise<TechnologySectionResponse> {
     const { id, input } = command
-    const { name, type } = input
+    const { name, technologyType } = input
 
-    const existedTechnologySection = await this.technologySectionModel.findOne({
-      'name.original': name.original,
-      type,
-    })
+    if (name) {
+      const existedTechnologySection = await this.technologySectionModel.findOne({
+        'name.original': name.original,
+        technologyType,
+      })
 
-    if (existedTechnologySection) {
-      throw new BadRequestException(t('message.technologySection.existed'))
+      if (existedTechnologySection) {
+        throw new BadRequestException(t('message.technologySection.existed'))
+      }
     }
 
     const updatedTechnologySection = await this.technologySectionModel.findOneAndUpdate(
       { _id: id },
-      { name, type },
+      {
+        name,
+        slug: name ? convertSlug(joinDisplayName(name)) : undefined,
+        technologyType,
+      },
       { new: true },
     )
 

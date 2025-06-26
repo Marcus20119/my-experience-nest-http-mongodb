@@ -1,9 +1,8 @@
-import { ApiProperty } from '@nestjs/swagger'
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 
 import { Technology } from '@/db/entities/technology.entity'
 
 import { IconType } from '../enums'
-import { DisplayName } from './display-name.interface'
 
 export class BaseTechnologyResponse {
   @ApiProperty({
@@ -12,9 +11,9 @@ export class BaseTechnologyResponse {
   id: string
 
   @ApiProperty({
-    type: DisplayName,
+    type: String,
   })
-  name: DisplayName
+  name: string
 
   @ApiProperty({
     enum: IconType,
@@ -22,30 +21,46 @@ export class BaseTechnologyResponse {
   })
   iconType: IconType
 
-  @ApiProperty({
+  @ApiPropertyOptional({
+    nullable: true,
     type: String,
   })
-  iconUrl: string
+  iconUrl?: string
+
+  @ApiPropertyOptional({
+    nullable: true,
+    type: String,
+  })
+  iconName?: string
 
   @ApiProperty({
     type: String,
   })
-  iconName: string
+  color1: string
 
-  @ApiProperty({
+  @ApiPropertyOptional({
+    nullable: true,
     type: String,
   })
-  color: string
+  color2?: string
 
-  @ApiProperty({
+  @ApiPropertyOptional({
+    nullable: true,
     type: String,
   })
-  description: string
+  color3?: string
 
-  @ApiProperty({
+  @ApiPropertyOptional({
+    nullable: true,
+    type: String,
+  })
+  description?: string
+
+  @ApiPropertyOptional({
+    nullable: true,
     type: Number,
   })
-  rate: number
+  rate?: number
 
   constructor(technology: Technology) {
     this.id = technology.id
@@ -53,7 +68,9 @@ export class BaseTechnologyResponse {
     this.iconType = technology.iconType
     this.iconUrl = technology.iconUrl
     this.iconName = technology.iconName
-    this.color = technology.color
+    this.color1 = technology.color1
+    this.color2 = technology.color2
+    this.color3 = technology.color3
     this.description = technology.description
     this.rate = technology.rate
   }

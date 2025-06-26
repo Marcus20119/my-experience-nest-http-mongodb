@@ -19,7 +19,9 @@
   },
   "technology": {
     "existed": "Technology existed",
-    "notFound": "Technology not found"
+    "notFound": "Technology not found",
+    "shouldContainIconName": "Should contain icon name",
+    "shouldContainIconUrl": "Should contain icon url"
   },
   "technologySection": {
     "existed": "Technology section existed",

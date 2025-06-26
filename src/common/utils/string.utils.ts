@@ -6,13 +6,26 @@ export const escapeSpecialChars = (str: string) => {
   return str.replaceAll(/[+*?()]/g, String.raw`\$&`)
 }
 
-export const joinDisplayName = (name: DisplayName) => {
+export const joinDisplayName = (name?: DisplayName) => {
+  console.log(' name:', name)
+  if (!name) {
+    return ''
+  }
+
+  if (!name.translations) {
+    return name.original
+  }
+
   return name.translations?.reduce((acc, translation) => {
-    return `${acc} ${translation.content}`
+    return `${acc} ${translation.content || ''}`
   }, name.original)
 }
 
-export function convertSlug(text: string): string {
+export function convertSlug(text?: string): string {
+  if (!text) {
+    return ''
+  }
+
   return slugify(text, {
     lower: true,
     remove: /[^\w\s()-]/g,

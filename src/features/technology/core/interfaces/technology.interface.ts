@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger'
+import { ApiPropertyOptional } from '@nestjs/swagger'
 
 import { TechnologyType } from '@/common/enums'
 import {
@@ -9,30 +9,34 @@ import {
 import { Technology } from '@/db/entities'
 
 export class TechnologyResponse extends BaseTechnologyResponse {
-  @ApiProperty({
+  @ApiPropertyOptional({
     enum: TechnologyType,
+    nullable: true,
     type: String,
   })
   type: TechnologyType
 
-  @ApiProperty({
+  @ApiPropertyOptional({
+    nullable: true,
     type: String,
   })
-  technologySectionId: string
+  technologySectionId?: string
 
-  @ApiProperty({
+  @ApiPropertyOptional({
+    nullable: true,
     type: [BaseKnowledgeGroupResponse],
   })
   knowledgeGroups: BaseKnowledgeGroupResponse[]
 
-  @ApiProperty({
+  @ApiPropertyOptional({
+    nullable: true,
     type: [BaseKnowledgeItemResponse],
   })
   knowledgeItems: BaseKnowledgeItemResponse[]
 
   constructor(technology: Technology) {
     super(technology)
-    this.type = technology.type
+    this.type = technology.technologyType
     this.technologySectionId = technology.technologySectionId
     this.knowledgeGroups = technology.knowledgeGroups
     this.knowledgeItems = technology.knowledgeItems

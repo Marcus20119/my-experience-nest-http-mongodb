@@ -35,8 +35,10 @@ export class ListTechnologyQueryHandler implements IQueryHandler<ListTechnologyQ
 
     const { items, total } = await DBCommand.runGetMany<Technology>(this.technologyModel, payload)
 
+    const results = await Promise.all(items.map(async (i) => new TechnologyResponse(i)))
+
     return PaginationHelper.pagination({
-      items,
+      items: results,
       limit,
       offset,
       totalItems: total,
