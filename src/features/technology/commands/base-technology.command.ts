@@ -22,48 +22,66 @@ export class BaseTechnologyCommand {
       return
     }
 
+    switch (syncAction) {
+      case SyncAction.CREATE: {
+        await this.addTechnologyToSection({
+          technology,
+          technologySectionId,
+        })
+        break
+      }
+
+      case SyncAction.UPDATE: {
+        await this.removeTechnologyInSection({ technologyId: technology.id, technologySectionId })
+        await this.addTechnologyToSection({ technology, technologySectionId })
+        break
+      }
+
+      case SyncAction.DELETE: {
+        await this.removeTechnologyInSection({
+          technologyId: technology.id,
+          technologySectionId,
+        })
+        break
+      }
+    }
+  }
+
+  private async addTechnologyToSection({
+    technology,
+    technologySectionId,
+  }: {
+    technology: Technology
+    technologySectionId: string
+  }) {
     const section = await this.technologySectionModel.findById(technologySectionId)
 
     if (!section) {
       throw new BadRequestException(t('message.technologySection.notFound'))
     }
 
-    switch (syncAction) {
-      case SyncAction.CREATE: {
-        const index = section.technologies.findIndex((item) => item.id === technology.id)
+    section.technologies.push(new BaseTechnologyResponse(technology))
+    await section.save()
+  }
 
-        const updated = new BaseTechnologyResponse(technology)
+  private async removeTechnologyInSection({
+    technologyId,
+    technologySectionId,
+  }: {
+    technologySectionId: string
+    technologyId: string
+  }) {
+    const section = await this.technologySectionModel.findById(technologySectionId)
 
-        if (index >= 0) {
-          section.technologies[index] = updated
-        } else {
-          section.technologies.push(updated)
-        }
-
-        break
-      }
-
-      case SyncAction.DELETE: {
-        const index = section.technologies.findIndex((item) => item.id === technology.id)
-
-        if (index >= 0) {
-          section.technologies.splice(index, 1)
-        }
-
-        break
-      }
-
-      case SyncAction.UPDATE: {
-        const index = section.technologies.findIndex((item) => item.id === technology.id)
-
-        if (index >= 0) {
-          section.technologies[index] = new BaseTechnologyResponse(technology)
-        }
-
-        break
-      }
+    if (!section) {
+      throw new BadRequestException(t('message.technologySection.notFound'))
     }
 
-    await section.save()
+    const index = section.technologies.findIndex((item) => item.id === technologyId)
+
+    if (index >= 0) {
+      section.technologies.splice(index, 1)
+      await section.save()
+    }
   }
 }
