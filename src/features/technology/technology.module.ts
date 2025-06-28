@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common'
 
 import { CreateTechnologyCommandHandler } from './commands/create-technology.command'
 import { DeleteTechnologyCommandHandler } from './commands/delete-technology.command'
+import { UpdateTechnologyCommandHandler } from './commands/update-technology.command'
 import { TechnologyController } from './controllers/technology.controller'
 import { DetailTechnologyQueryHandler } from './queries/detail-technology.query'
 import { ListTechnologyQueryHandler } from './queries/list-technology.query'
@@ -12,6 +13,7 @@ import { ListTechnologyQueryHandler } from './queries/list-technology.query'
     ListTechnologyQueryHandler,
     DetailTechnologyQueryHandler,
     CreateTechnologyCommandHandler,
+    UpdateTechnologyCommandHandler,
     DeleteTechnologyCommandHandler,
   ],
 })

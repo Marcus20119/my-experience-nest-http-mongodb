@@ -34,8 +34,8 @@ export class UpdateTechnologySectionCommandHandler
 
     if (name) {
       const existedTechnologySection = await this.technologySectionModel.findOne({
+        _id: { $ne: id },
         'name.original': name.original,
-        technologyType,
       })
 
       if (existedTechnologySection) {

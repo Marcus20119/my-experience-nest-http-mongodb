@@ -1,4 +1,14 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Post, Query } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Put,
+  Query,
+} from '@nestjs/common'
 import { CommandBus, QueryBus } from '@nestjs/cqrs'
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
 
@@ -11,6 +21,10 @@ import {
   CreateTechnologyInput,
 } from '../commands/create-technology.command'
 import { DeleteTechnologyCommand } from '../commands/delete-technology.command'
+import {
+  UpdateTechnologyCommand,
+  UpdateTechnologyInput,
+} from '../commands/update-technology.command'
 import { TechnologyResponse } from '../core/interfaces/technology.interface'
 import { DetailTechnologyQuery } from '../queries/detail-technology.query'
 import { ListTechnologyQueryInput } from '../queries/list-technology.query'
@@ -28,6 +42,13 @@ export class TechnologyController {
   @ApiSuccessResponse({ type: TechnologyResponse })
   async createTechnology(@Body() input: CreateTechnologyInput) {
     return await this.commandBus.execute(new CreateTechnologyCommand(input))
+  }
+
+  @Put(':id')
+  @ApiOperation({ summary: 'Update technology' })
+  @ApiSuccessResponse({ type: TechnologyResponse })
+  async updateTechnology(@Body() input: UpdateTechnologyInput, @RequiredId('id') id: string) {
+    return await this.commandBus.execute(new UpdateTechnologyCommand(id, input))
   }
 
   @Delete(':id')

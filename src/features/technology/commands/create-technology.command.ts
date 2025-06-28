@@ -124,25 +124,7 @@ export class CreateTechnologyCommandHandler
       technologyType,
     } = input
 
-    switch (iconType) {
-      case IconType.ICONIFY: {
-        if (!iconName) {
-          throw new BadRequestException(t('message.technology.shouldContainIconName'))
-        }
-        break
-      }
-
-      case IconType.CUSTOM: {
-        if (!iconUrl) {
-          throw new BadRequestException(t('message.technology.shouldContainIconUrl'))
-        }
-        break
-      }
-
-      default: {
-        break
-      }
-    }
+    this.verifyIcon(input)
 
     const existedTechnology = await this.technologyModel.findOne({
       name,

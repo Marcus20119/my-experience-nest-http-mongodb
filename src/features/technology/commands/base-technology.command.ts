@@ -1,7 +1,7 @@
 import { BadRequestException } from '@nestjs/common'
-import { Model } from 'mongoose'
+import { ClientSession, Model } from 'mongoose'
 
-import { SyncAction } from '@/common/enums'
+import { IconType, SyncAction } from '@/common/enums'
 import { BaseTechnologyResponse } from '@/common/interfaces'
 import { t } from '@/common/utils'
 import { Technology, TechnologySection } from '@/db/entities'
@@ -9,14 +9,44 @@ import { Technology, TechnologySection } from '@/db/entities'
 export class BaseTechnologyCommand {
   constructor(protected readonly technologySectionModel: Model<TechnologySection>) {}
 
+  protected verifyIcon(technology?: Partial<Technology>): void {
+    if (!technology) {
+      return
+    }
+
+    const { iconName, iconType, iconUrl } = technology
+
+    switch (iconType) {
+      case IconType.ICONIFY: {
+        if (!iconName) {
+          throw new BadRequestException(t('message.technology.shouldContainIconName'))
+        }
+        break
+      }
+
+      case IconType.CUSTOM: {
+        if (!iconUrl) {
+          throw new BadRequestException(t('message.technology.shouldContainIconUrl'))
+        }
+        break
+      }
+
+      default: {
+        break
+      }
+    }
+  }
+
   protected async syncTechnologySectionInfo({
+    session,
     syncAction,
     technology,
     technologySectionId,
   }: {
+    session?: ClientSession
+    syncAction: SyncAction
     technology: Technology
     technologySectionId?: string
-    syncAction: SyncAction
   }): Promise<void> {
     if (!technologySectionId) {
       return
@@ -25,22 +55,37 @@ export class BaseTechnologyCommand {
     switch (syncAction) {
       case SyncAction.CREATE: {
         await this.addTechnologyToSection({
+          session,
           technology,
-          technologySectionId,
+          technologySectionId: technology.technologySectionId || technologySectionId,
         })
         break
       }
 
       case SyncAction.UPDATE: {
-        await this.removeTechnologyInSection({ technologyId: technology.id, technologySectionId })
-        await this.addTechnologyToSection({ technology, technologySectionId })
+        await this.removeTechnologyInSection({
+          session,
+          technologyId: technology.id,
+          technologySectionId,
+        })
+
+        if (!technology.technologySectionId) {
+          return
+        }
+
+        await this.addTechnologyToSection({
+          session,
+          technology,
+          technologySectionId: technology.technologySectionId,
+        })
         break
       }
 
       case SyncAction.DELETE: {
         await this.removeTechnologyInSection({
+          session,
           technologyId: technology.id,
-          technologySectionId,
+          technologySectionId: technology.technologySectionId || technologySectionId,
         })
         break
       }
@@ -48,30 +93,44 @@ export class BaseTechnologyCommand {
   }
 
   private async addTechnologyToSection({
+    session = null,
     technology,
     technologySectionId,
   }: {
+    session?: ClientSession | null
     technology: Technology
     technologySectionId: string
   }) {
-    const section = await this.technologySectionModel.findById(technologySectionId)
+    const section = await this.technologySectionModel
+      .findById({
+        _id: technologySectionId,
+      })
+      .session(session)
 
     if (!section) {
       throw new BadRequestException(t('message.technologySection.notFound'))
     }
 
     section.technologies.push(new BaseTechnologyResponse(technology))
-    await section.save()
+    await section.save({
+      session,
+    })
   }
 
   private async removeTechnologyInSection({
+    session = null,
     technologyId,
     technologySectionId,
   }: {
-    technologySectionId: string
+    session?: ClientSession | null
     technologyId: string
+    technologySectionId: string
   }) {
-    const section = await this.technologySectionModel.findById(technologySectionId)
+    const section = await this.technologySectionModel
+      .findById({
+        _id: technologySectionId,
+      })
+      .session(session)
 
     if (!section) {
       throw new BadRequestException(t('message.technologySection.notFound'))
@@ -81,7 +140,9 @@ export class BaseTechnologyCommand {
 
     if (index >= 0) {
       section.technologies.splice(index, 1)
-      await section.save()
+      await section.save({
+        session,
+      })
     }
   }
 }
