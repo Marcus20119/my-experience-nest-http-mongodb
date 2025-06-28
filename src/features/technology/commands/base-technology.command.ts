@@ -38,37 +38,18 @@ export class BaseTechnologyCommand {
   }
 
   protected async syncTechnologySectionInfo({
+    oldTechnologySectionId,
     session,
     syncAction,
     technology,
-    technologySectionId,
   }: {
+    oldTechnologySectionId?: string
     session?: ClientSession
     syncAction: SyncAction
     technology: Technology
-    technologySectionId?: string
   }): Promise<void> {
-    if (!technologySectionId) {
-      return
-    }
-
     switch (syncAction) {
       case SyncAction.CREATE: {
-        await this.addTechnologyToSection({
-          session,
-          technology,
-          technologySectionId: technology.technologySectionId || technologySectionId,
-        })
-        break
-      }
-
-      case SyncAction.UPDATE: {
-        await this.removeTechnologyInSection({
-          session,
-          technologyId: technology.id,
-          technologySectionId,
-        })
-
         if (!technology.technologySectionId) {
           return
         }
@@ -81,11 +62,34 @@ export class BaseTechnologyCommand {
         break
       }
 
-      case SyncAction.DELETE: {
+      case SyncAction.UPDATE: {
+        if (!technology.technologySectionId || !oldTechnologySectionId) {
+          return
+        }
+
         await this.removeTechnologyInSection({
           session,
           technologyId: technology.id,
-          technologySectionId: technology.technologySectionId || technologySectionId,
+          technologySectionId: oldTechnologySectionId,
+        })
+
+        await this.addTechnologyToSection({
+          session,
+          technology,
+          technologySectionId: technology.technologySectionId,
+        })
+        break
+      }
+
+      case SyncAction.DELETE: {
+        if (!technology.technologySectionId) {
+          return
+        }
+
+        await this.removeTechnologyInSection({
+          session,
+          technologyId: technology.id,
+          technologySectionId: technology.technologySectionId,
         })
         break
       }
@@ -101,11 +105,7 @@ export class BaseTechnologyCommand {
     technology: Technology
     technologySectionId: string
   }) {
-    const section = await this.technologySectionModel
-      .findById({
-        _id: technologySectionId,
-      })
-      .session(session)
+    const section = await this.technologySectionModel.findById(technologySectionId).session(session)
 
     if (!section) {
       throw new BadRequestException(t('message.technologySection.notFound'))
@@ -126,11 +126,7 @@ export class BaseTechnologyCommand {
     technologyId: string
     technologySectionId: string
   }) {
-    const section = await this.technologySectionModel
-      .findById({
-        _id: technologySectionId,
-      })
-      .session(session)
+    const section = await this.technologySectionModel.findById(technologySectionId).session(session)
 
     if (!section) {
       throw new BadRequestException(t('message.technologySection.notFound'))

@@ -72,11 +72,7 @@ export class UpdateTechnologyCommandHandler
         }
       }
 
-      const existedTechnology = await this.technologyModel
-        .findById({
-          _id: id,
-        })
-        .session(session)
+      const oldTechnology = await this.technologyModel.findById(id).session(session)
 
       const updatedTechnology = await this.technologyModel.findOneAndUpdate(
         { _id: id },
@@ -101,12 +97,26 @@ export class UpdateTechnologyCommandHandler
         throw new BadRequestException(t('message.technology.notFound'))
       }
 
-      await this.syncTechnologySectionInfo({
-        session,
-        syncAction: SyncAction.UPDATE,
-        technology: updatedTechnology,
-        technologySectionId: existedTechnology?.technologySectionId,
-      })
+      if (technologySectionId) {
+        const technologySection = await this.technologySectionModel
+          .findById(input.technologySectionId)
+          .session(session)
+
+        if (!technologySection) {
+          throw new BadRequestException(t('message.technologySection.notFound'))
+        }
+
+        if (technologySection.technologyType !== technologyType) {
+          throw new BadRequestException(t('message.technology.technologyTypeNotMatch'))
+        }
+
+        await this.syncTechnologySectionInfo({
+          oldTechnologySectionId: oldTechnology?.technologySectionId,
+          session,
+          syncAction: SyncAction.UPDATE,
+          technology: updatedTechnology,
+        })
+      }
 
       await session.commitTransaction()
       return new TechnologyResponse(updatedTechnology)

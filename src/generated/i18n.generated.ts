@@ -8,6 +8,7 @@ export type I18nTranslations = {
     "message": {
         "base": {
             "actionDenied": string;
+            "badRequest": string;
             "forbidden": string;
             "formatOrderIncorrect": string;
             "incorrectPhoneNumber": string;
@@ -29,6 +30,7 @@ export type I18nTranslations = {
             "notFound": string;
             "shouldContainIconName": string;
             "shouldContainIconUrl": string;
+            "technologyTypeNotMatch": string;
         };
         "technologySection": {
             "existed": string;

@@ -1,7 +1,7 @@
 import { BadRequestException } from '@nestjs/common'
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
-import { InjectModel } from '@nestjs/mongoose'
-import { Model } from 'mongoose'
+import { InjectConnection, InjectModel } from '@nestjs/mongoose'
+import { Connection, Model } from 'mongoose'
 
 import { SyncAction } from '@/common/enums'
 import { t } from '@/common/utils'
@@ -23,22 +23,35 @@ export class DeleteTechnologyCommandHandler
     protected readonly technologyModel: Model<Technology>,
     @InjectModel(TechnologySection.name)
     protected readonly technologySectionModel: Model<TechnologySection>,
+    @InjectConnection()
+    private readonly connection: Connection,
   ) {
     super(technologySectionModel)
   }
 
   async execute(command: DeleteTechnologyCommand): Promise<void> {
-    const technology = await this.technologyModel.findById(command.id)
+    const session = await this.connection.startSession()
+    session.startTransaction()
 
-    if (!technology) {
-      throw new BadRequestException(t('message.technology.notFound'))
+    try {
+      const technology = await this.technologyModel.findById(command.id).session(session)
+
+      if (!technology) {
+        throw new BadRequestException(t('message.technology.notFound'))
+      }
+
+      await this.syncTechnologySectionInfo({
+        session,
+        syncAction: SyncAction.DELETE,
+        technology,
+      })
+      await this.technologyModel.findByIdAndDelete(command.id).session(session)
+      await session.commitTransaction()
+    } catch (error) {
+      await session.abortTransaction()
+      throw error
+    } finally {
+      session.endSession()
     }
-
-    await this.syncTechnologySectionInfo({
-      syncAction: SyncAction.DELETE,
-      technology,
-      technologySectionId: technology.technologySectionId,
-    })
-    await this.technologyModel.findByIdAndDelete(command.id)
   }
 }

@@ -1,9 +1,9 @@
 import { BadRequestException } from '@nestjs/common'
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
-import { InjectModel } from '@nestjs/mongoose'
+import { InjectConnection, InjectModel } from '@nestjs/mongoose'
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import { IsEnum, IsMongoId, IsNotEmpty, IsNumber, IsOptional } from 'class-validator'
-import { Model } from 'mongoose'
+import { Connection, Model } from 'mongoose'
 
 import { IsStepInRange } from '@/common/decorators'
 import { IconType, SyncAction, TechnologyType } from '@/common/enums'
@@ -104,6 +104,8 @@ export class CreateTechnologyCommandHandler
     protected readonly technologyModel: Model<Technology>,
     @InjectModel(TechnologySection.name)
     protected readonly technologySectionModel: Model<TechnologySection>,
+    @InjectConnection()
+    private readonly connection: Connection,
   ) {
     super(technologySectionModel)
   }
@@ -126,47 +128,66 @@ export class CreateTechnologyCommandHandler
 
     this.verifyIcon(input)
 
-    const existedTechnology = await this.technologyModel.findOne({
-      name,
-    })
+    const session = await this.connection.startSession()
+    session.startTransaction()
 
-    if (existedTechnology) {
-      throw new BadRequestException(t('message.technology.existed'))
-    }
+    try {
+      const existedTechnology = await this.technologyModel
+        .findOne({
+          name,
+        })
+        .session(session)
 
-    const newTechnology = await this.technologyModel.create({
-      color1,
-      color2,
-      color3,
-      description,
-      iconName,
-      iconType,
-      iconUrl,
-      name,
-      rate,
-      slug: convertSlug(name),
-      technologySectionId,
-      technologyType,
-    })
-
-    if (technologySectionId) {
-      const technologySection = await this.technologySectionModel.findById(
-        input.technologySectionId,
-      )
-
-      if (!technologySection) {
-        throw new BadRequestException(t('message.technologySection.notFound'))
+      if (existedTechnology) {
+        throw new BadRequestException(t('message.technology.existed'))
       }
 
-      await this.syncTechnologySectionInfo({
-        syncAction: SyncAction.CREATE,
-        technology: newTechnology,
+      const newTechnology = new this.technologyModel({
+        color1,
+        color2,
+        color3,
+        description,
+        iconName,
+        iconType,
+        iconUrl,
+        name,
+        rate,
+        slug: convertSlug(name),
         technologySectionId,
+        technologyType,
       })
+
+      await newTechnology.save({
+        session,
+      })
+
+      if (technologySectionId) {
+        const technologySection = await this.technologySectionModel
+          .findById(input.technologySectionId)
+          .session(session)
+
+        if (!technologySection) {
+          throw new BadRequestException(t('message.technologySection.notFound'))
+        }
+
+        if (technologySection.technologyType !== technologyType) {
+          throw new BadRequestException(t('message.technology.technologyTypeNotMatch'))
+        }
+
+        await this.syncTechnologySectionInfo({
+          session,
+          syncAction: SyncAction.CREATE,
+          technology: newTechnology,
+        })
+      }
+
+      await session.commitTransaction()
+      return new TechnologyResponse(newTechnology)
+    } catch (error) {
+      await session.abortTransaction()
+      throw error
+    } finally {
+      session.endSession()
     }
-
-    await newTechnology.save()
-
-    return new TechnologyResponse(newTechnology)
   }
 }

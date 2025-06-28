@@ -1,6 +1,7 @@
 {
   "base": {
     "actionDenied": "You don't have permission to perform this action!",
+    "badRequest": "Bad request",
     "forbidden": "Forbidden",
     "formatOrderIncorrect": "Format order incorrect",
     "incorrectPhoneNumber": "Incorrect phone number",
@@ -21,7 +22,8 @@
     "existed": "Technology existed",
     "notFound": "Technology not found",
     "shouldContainIconName": "Should contain icon name",
-    "shouldContainIconUrl": "Should contain icon url"
+    "shouldContainIconUrl": "Should contain icon url",
+    "technologyTypeNotMatch": "Technology type not match with technology section"
   },
   "technologySection": {
     "existed": "Technology section existed",
