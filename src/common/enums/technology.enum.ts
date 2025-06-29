@@ -1,7 +1,7 @@
 export enum TechnologyType {
-  BACKEND = 'Backend',
-  CLOUD = 'Cloud',
-  FRONTEND = 'Frontend',
-  LANGUAGE = 'Language',
-  MOBILE = 'Mobile',
+  Backend = 'backend',
+  Cloud = 'cloud',
+  Frontend = 'frontend',
+  Language = 'language',
+  Mobile = 'mobile',
 }

@@ -1,15 +1,15 @@
 export enum Language {
-  EN = 'en',
-  VI = 'vi',
+  En = 'en',
+  Vi = 'vi',
 }
 
 export enum SortType {
-  ASC = 'asc',
-  DESC = 'desc',
+  Asc = 'asc',
+  Desc = 'desc',
 }
 
 export enum SyncAction {
-  CREATE = 'create',
-  DELETE = 'delete',
-  UPDATE = 'update',
+  Create = 'create',
+  Delete = 'delete',
+  Update = 'update',
 }

@@ -1,4 +1,4 @@
 export enum IconType {
-  CUSTOM = 'custom',
-  ICONIFY = 'iconify',
+  Custom = 'custom',
+  Iconify = 'iconify',
 }

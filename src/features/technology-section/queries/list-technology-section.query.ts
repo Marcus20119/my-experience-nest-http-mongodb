@@ -8,11 +8,15 @@ import BuildQuery from '@/common/utils/helper'
 import PaginationHelper from '@/common/utils/pagination-helper'
 import { TechnologySection } from '@/db/entities/technology-section.entity'
 
-import { TechnologySectionResponse } from '../core/interfaces/technology-section.interface'
+import {
+  TechnologySectionQueryFilter,
+  TechnologySectionResponse,
+} from '../core/interfaces/technology-section.interface'
 
 export class ListTechnologySectionQueryInput {
   constructor(
     public params: {
+      filter: TechnologySectionQueryFilter
       pagination: PaginationDto
       orderBy: OrderDto
     },
@@ -51,12 +55,19 @@ export class ListTechnologySectionQueryHandler
   }
 
   private async handleFilter(command: ListTechnologySectionQueryInput) {
-    const { orderBy, pagination } = command.params
+    const { filter, orderBy, pagination } = command.params
 
     const payload = BuildQuery.getManyRequest({
+      filter,
       orderBy,
       pagination,
     })
+
+    if (filter.technologyType) {
+      payload.filters.technologyType = {
+        $eq: filter.technologyType,
+      }
+    }
 
     return payload
   }

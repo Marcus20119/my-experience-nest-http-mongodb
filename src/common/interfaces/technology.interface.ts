@@ -17,6 +17,7 @@ export class BaseTechnologyResponse {
 
   @ApiProperty({
     enum: IconType,
+    enumName: 'IconType',
     type: String,
   })
   iconType: IconType

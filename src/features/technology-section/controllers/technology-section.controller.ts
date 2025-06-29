@@ -10,10 +10,10 @@ import {
   Query,
 } from '@nestjs/common'
 import { CommandBus, QueryBus } from '@nestjs/cqrs'
-import { ApiOperation, ApiTags } from '@nestjs/swagger'
+import { ApiExtraModels, ApiOperation, ApiTags } from '@nestjs/swagger'
 
 import { RequiredId } from '@/common/decorators'
-import { ApiSuccessResponse } from '@/common/libs/swagger'
+import { ApiSuccessPaginatedResponse, ApiSuccessResponse } from '@/common/libs/swagger'
 import { OrderDto, PaginationDto } from '@/common/types'
 
 import {
@@ -25,7 +25,10 @@ import {
   UpdateTechnologySectionCommand,
   UpdateTechnologySectionInput,
 } from '../commands/update-technology-section.command'
-import { TechnologySectionResponse } from '../core/interfaces/technology-section.interface'
+import {
+  TechnologySectionQueryFilter,
+  TechnologySectionResponse,
+} from '../core/interfaces/technology-section.interface'
 import { DetailTechnologySectionQuery } from '../queries/detail-technology-section.query'
 import { ListTechnologySectionQueryInput } from '../queries/list-technology-section.query'
 
@@ -69,11 +72,17 @@ export class TechnologySectionController {
   }
 
   @Get()
+  @ApiExtraModels(TechnologySectionQueryFilter)
   @ApiOperation({ summary: 'Get list technology sections' })
-  @ApiSuccessResponse({ type: TechnologySectionResponse })
-  async getListTechnologySections(@Query() pagination: PaginationDto, @Query() orderBy: OrderDto) {
+  @ApiSuccessPaginatedResponse({ type: TechnologySectionResponse })
+  async getListTechnologySections(
+    @Query() filter: TechnologySectionQueryFilter,
+    @Query() pagination: PaginationDto,
+    @Query() orderBy: OrderDto,
+  ) {
     return await this.queryBus.execute(
       new ListTechnologySectionQueryInput({
+        filter,
         orderBy,
         pagination,
       }),

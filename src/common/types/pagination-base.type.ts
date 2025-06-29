@@ -20,10 +20,16 @@ import {
 } from './query.type'
 
 export class IMeta {
-  @ApiProperty()
+  @ApiProperty({
+    default: 10,
+    type: Number,
+  })
   limit: number
 
-  @ApiProperty()
+  @ApiProperty({
+    default: 0,
+    type: Number,
+  })
   offset: number
 
   @ApiProperty()
@@ -42,7 +48,7 @@ export class IPaginatedResponse<T> {
   @ApiProperty()
   items: T[]
 
-  @ApiProperty()
+  @ApiProperty({ type: IMeta })
   meta: IMeta
 }
 
@@ -96,7 +102,7 @@ export class SortInputDto {
 
   @IsNotEmpty()
   @IsString()
-  @ApiProperty({ enum: SortType })
+  @ApiProperty({ enum: SortType, enumName: 'SortType' })
   sortType: SortType
 }
 

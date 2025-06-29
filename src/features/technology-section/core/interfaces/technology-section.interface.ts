@@ -1,7 +1,9 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import { IsEnum, IsOptional } from 'class-validator'
 
 import { TechnologyType } from '@/common/enums'
 import { BaseTechnologyResponse, DisplayName } from '@/common/interfaces'
+import { RawFilterDto } from '@/common/types'
 import { TechnologySection } from '@/db/entities'
 
 export class TechnologySectionResponse {
@@ -12,9 +14,10 @@ export class TechnologySectionResponse {
 
   @ApiProperty({
     enum: TechnologyType,
+    enumName: 'TechnologyType',
     type: String,
   })
-  technologyType: string
+  technologyType: TechnologyType
 
   @ApiProperty({
     type: DisplayName,
@@ -33,4 +36,15 @@ export class TechnologySectionResponse {
     this.name = technologySection.name
     this.technologies = technologySection.technologies
   }
+}
+
+export class TechnologySectionQueryFilter implements RawFilterDto {
+  @ApiPropertyOptional({
+    enum: TechnologyType,
+    enumName: 'TechnologyType',
+    type: String,
+  })
+  @IsOptional()
+  @IsEnum(TechnologyType)
+  technologyType?: TechnologyType
 }

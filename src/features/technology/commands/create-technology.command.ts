@@ -22,6 +22,7 @@ export class CreateTechnologyInput {
 
   @ApiProperty({
     enum: IconType,
+    enumName: 'IconType',
     type: String,
   })
   @IsNotEmpty()
@@ -76,6 +77,7 @@ export class CreateTechnologyInput {
 
   @ApiProperty({
     enum: TechnologyType,
+    enumName: 'TechnologyType',
     type: String,
   })
   @IsNotEmpty()
@@ -176,7 +178,7 @@ export class CreateTechnologyCommandHandler
 
         await this.syncTechnologySectionInfo({
           session,
-          syncAction: SyncAction.CREATE,
+          syncAction: SyncAction.Create,
           technology: newTechnology,
         })
       }

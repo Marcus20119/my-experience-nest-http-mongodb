@@ -17,14 +17,14 @@ export class BaseTechnologyCommand {
     const { iconName, iconType, iconUrl } = technology
 
     switch (iconType) {
-      case IconType.ICONIFY: {
+      case IconType.Iconify: {
         if (!iconName) {
           throw new BadRequestException(t('message.technology.shouldContainIconName'))
         }
         break
       }
 
-      case IconType.CUSTOM: {
+      case IconType.Custom: {
         if (!iconUrl) {
           throw new BadRequestException(t('message.technology.shouldContainIconUrl'))
         }
@@ -49,7 +49,7 @@ export class BaseTechnologyCommand {
     technology: Technology
   }): Promise<void> {
     switch (syncAction) {
-      case SyncAction.CREATE: {
+      case SyncAction.Create: {
         if (!technology.technologySectionId) {
           return
         }
@@ -62,7 +62,7 @@ export class BaseTechnologyCommand {
         break
       }
 
-      case SyncAction.UPDATE: {
+      case SyncAction.Update: {
         if (!technology.technologySectionId || !oldTechnologySectionId) {
           return
         }
@@ -81,7 +81,7 @@ export class BaseTechnologyCommand {
         break
       }
 
-      case SyncAction.DELETE: {
+      case SyncAction.Delete: {
         if (!technology.technologySectionId) {
           return
         }

@@ -11,6 +11,7 @@ import { Technology } from '@/db/entities'
 export class TechnologyResponse extends BaseTechnologyResponse {
   @ApiPropertyOptional({
     enum: TechnologyType,
+    enumName: 'TechnologyType',
     nullable: true,
     type: String,
   })

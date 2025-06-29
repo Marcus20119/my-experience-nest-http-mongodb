@@ -7,6 +7,7 @@ import { Language } from '../enums'
 export class I18nContentTranslation {
   @ApiProperty({
     enum: Language,
+    enumName: 'Language',
     type: String,
   })
   @IsNotEmpty()

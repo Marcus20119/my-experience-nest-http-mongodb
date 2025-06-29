@@ -10,7 +10,7 @@ import { config } from '@/config'
 @Module({
   imports: [
     I18nModule.forRoot({
-      fallbackLanguage: Language.VI,
+      fallbackLanguage: Language.Vi,
       loaderOptions: {
         path: path.join(__dirname, '../locales/'),
         watch: config.app.env === APP_ENV.LOCAL,

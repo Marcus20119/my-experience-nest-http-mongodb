@@ -71,7 +71,7 @@ export default class BuildQuery {
       select,
       sort: input.order
         ? {
-            [input.order.sortBy]: input.order.sortType === SortType.ASC ? 1 : -1,
+            [input.order.sortBy]: input.order.sortType === SortType.Asc ? 1 : -1,
           }
         : { createdAt: -1 },
     }
@@ -192,7 +192,7 @@ export default class BuildQuery {
   static buildSort(sort: any, sortInput: SortInputDto) {
     return {
       ...sort,
-      [sortInput.sortBy]: sortInput.sortType === SortType.ASC ? 1 : -1,
+      [sortInput.sortBy]: sortInput.sortType === SortType.Asc ? 1 : -1,
     }
   }
 

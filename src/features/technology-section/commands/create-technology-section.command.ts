@@ -16,6 +16,7 @@ import { TechnologySectionResponse } from '../core/interfaces/technology-section
 export class CreateTechnologySectionInput {
   @ApiProperty({
     enum: TechnologyType,
+    enumName: 'TechnologyType',
     type: String,
   })
   @IsNotEmpty()

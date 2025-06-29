@@ -113,7 +113,7 @@ export class UpdateTechnologyCommandHandler
         await this.syncTechnologySectionInfo({
           oldTechnologySectionId: oldTechnology?.technologySectionId,
           session,
-          syncAction: SyncAction.UPDATE,
+          syncAction: SyncAction.Update,
           technology: updatedTechnology,
         })
       }

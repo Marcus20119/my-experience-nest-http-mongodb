@@ -42,7 +42,7 @@ export class DeleteTechnologyCommandHandler
 
       await this.syncTechnologySectionInfo({
         session,
-        syncAction: SyncAction.DELETE,
+        syncAction: SyncAction.Delete,
         technology,
       })
       await this.technologyModel.findByIdAndDelete(command.id).session(session)

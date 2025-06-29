@@ -27,7 +27,7 @@ export class RequestContextMiddleware implements NestMiddleware {
         )
       }
 
-      context.lang = (I18nContext.current()?.lang as Language) ?? Language.EN
+      context.lang = (I18nContext.current()?.lang as Language) ?? Language.En
 
       return context
     }, next)

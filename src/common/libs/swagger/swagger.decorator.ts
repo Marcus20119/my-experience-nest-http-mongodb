@@ -5,7 +5,7 @@ import {
   SchemaObject,
 } from '@nestjs/swagger/dist/interfaces/open-api-spec.interface'
 
-import { BaseResponse, IPaginatedResponse } from '@/common/types'
+import { BaseResponse, IPaginatedResponse, OrderDto, PaginationDto } from '@/common/types'
 
 type ApiCustomResponseOptions = ApiResponseOptions & {
   type: Type<unknown>
@@ -47,8 +47,7 @@ export const ApiSuccessPaginatedResponse = (options: ApiCustomResponseOptions) =
   delete addOnOptions.type
 
   return applyDecorators(
-    ApiExtraModels(BaseResponse, options.type),
-    ApiExtraModels(IPaginatedResponse, options.type),
+    ApiExtraModels(BaseResponse, IPaginatedResponse, options.type, PaginationDto, OrderDto),
     ApiOkResponse({
       ...addOnOptions,
       schema: {
@@ -70,6 +69,7 @@ export const ApiSuccessPaginatedResponse = (options: ApiCustomResponseOptions) =
                         type: 'array',
                       },
                     },
+                    type: 'object',
                   },
                 ],
               },
