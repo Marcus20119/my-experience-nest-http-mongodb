@@ -1,7 +1,8 @@
+/* eslint-disable perfectionist/sort-enums */
 export enum TechnologyType {
-  Backend = 'backend',
-  Cloud = 'cloud',
   Frontend = 'frontend',
-  Language = 'language',
+  Backend = 'backend',
   Mobile = 'mobile',
+  Cloud = 'cloud',
+  Language = 'language',
 }

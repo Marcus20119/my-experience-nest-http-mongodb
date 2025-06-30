@@ -28,9 +28,11 @@ import {
 import {
   TechnologySectionQueryFilter,
   TechnologySectionResponse,
+  TechnologySkeletonResponse,
 } from '../core/interfaces/technology-section.interface'
-import { DetailTechnologySectionQuery } from '../queries/detail-technology-section.query'
+import { DetailTechnologySectionQueryInput } from '../queries/detail-technology-section.query'
 import { ListTechnologySectionQueryInput } from '../queries/list-technology-section.query'
+import { TechnologySectionSkeletonQueryInput } from '../queries/technology-section-skeleton.query'
 
 @ApiTags('Technology section')
 @Controller('technology-sections')
@@ -64,11 +66,18 @@ export class TechnologySectionController {
     return await this.commandBus.execute(new DeleteTechnologySectionCommand(id))
   }
 
+  @Get('skeleton')
+  @ApiOperation({ summary: 'Get technology section skeleton' })
+  @ApiSuccessResponse({ type: TechnologySkeletonResponse })
+  async getTechnologySectionSkeleton() {
+    return await this.queryBus.execute(new TechnologySectionSkeletonQueryInput())
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Get detail technology section' })
   @ApiSuccessResponse({ type: TechnologySectionResponse })
   async getDetailTechnologySection(@RequiredId('id') id: string) {
-    return await this.queryBus.execute(new DetailTechnologySectionQuery(id))
+    return await this.queryBus.execute(new DetailTechnologySectionQueryInput(id))
   }
 
   @Get()

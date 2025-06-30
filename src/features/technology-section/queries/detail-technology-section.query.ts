@@ -8,20 +8,20 @@ import { TechnologySection } from '@/db/entities'
 
 import { TechnologySectionResponse } from '../core/interfaces/technology-section.interface'
 
-export class DetailTechnologySectionQuery {
+export class DetailTechnologySectionQueryInput {
   constructor(public readonly id: string) {}
 }
 
-@QueryHandler(DetailTechnologySectionQuery)
+@QueryHandler(DetailTechnologySectionQueryInput)
 export class DetailTechnologySectionQueryHandler
-  implements IQueryHandler<DetailTechnologySectionQuery>
+  implements IQueryHandler<DetailTechnologySectionQueryInput>
 {
   constructor(
     @InjectModel(TechnologySection.name)
     private readonly technologySectionModel: Model<TechnologySection>,
   ) {}
 
-  async execute(query: DetailTechnologySectionQuery): Promise<TechnologySectionResponse> {
+  async execute(query: DetailTechnologySectionQueryInput): Promise<TechnologySectionResponse> {
     const technologySection = await this.technologySectionModel.findById(query.id)
 
     if (!technologySection) {
