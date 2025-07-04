@@ -26,6 +26,11 @@ export class TechnologySection extends BaseEntity {
   slug: string
 
   @Prop({
+    type: String,
+  })
+  search: string
+
+  @Prop({
     type: [BaseTechnologyResponse],
   })
   technologies: BaseTechnologyResponse[]

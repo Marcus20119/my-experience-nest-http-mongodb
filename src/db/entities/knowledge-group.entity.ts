@@ -21,6 +21,11 @@ export class KnowledgeGroup extends BaseEntity {
   @Prop({
     type: String,
   })
+  search: string
+
+  @Prop({
+    type: String,
+  })
   description: string
 
   @Prop({

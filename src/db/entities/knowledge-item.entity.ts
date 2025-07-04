@@ -64,6 +64,11 @@ export class KnowledgeItem extends BaseEntity {
   @Prop({
     type: String,
   })
+  search: string
+
+  @Prop({
+    type: String,
+  })
   knowledgeGroupId: string
 
   @Prop({

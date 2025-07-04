@@ -7,7 +7,6 @@ export const escapeSpecialChars = (str: string) => {
 }
 
 export const joinDisplayName = (name?: DisplayName) => {
-  console.log(' name:', name)
   if (!name) {
     return ''
   }

@@ -17,9 +17,15 @@ export class BaseTechnologySectionResponse {
   })
   name: DisplayName
 
+  @ApiProperty({
+    type: String,
+  })
+  slug: string
+
   constructor(technologySection: TechnologySection) {
     this.id = technologySection.id
     this.name = technologySection.name
+    this.slug = technologySection.slug
   }
 }
 

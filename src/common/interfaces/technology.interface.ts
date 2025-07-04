@@ -63,6 +63,11 @@ export class BaseTechnologyResponse {
   })
   rate?: number
 
+  @ApiProperty({
+    type: String,
+  })
+  slug: string
+
   constructor(technology: Technology) {
     this.id = technology.id
     this.name = technology.name
@@ -74,5 +79,6 @@ export class BaseTechnologyResponse {
     this.color3 = technology.color3
     this.description = technology.description
     this.rate = technology.rate
+    this.slug = technology.slug
   }
 }

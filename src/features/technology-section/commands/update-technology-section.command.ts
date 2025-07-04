@@ -34,8 +34,11 @@ export class UpdateTechnologySectionCommandHandler
 
     if (name) {
       const existedTechnologySection = await this.technologySectionModel.findOne({
+        $and: [
+          { $or: [{ 'name.original': name.original }, { slug: convertSlug(name.original) }] },
+          { technologyType },
+        ],
         _id: { $ne: id },
-        'name.original': name.original,
       })
 
       if (existedTechnologySection) {
@@ -47,7 +50,8 @@ export class UpdateTechnologySectionCommandHandler
       { _id: id },
       {
         name,
-        slug: name ? convertSlug(joinDisplayName(name)) : undefined,
+        search: name ? convertSlug(joinDisplayName(name)) : undefined,
+        slug: name ? convertSlug(name.original) : undefined,
         technologyType,
       },
       { new: true },

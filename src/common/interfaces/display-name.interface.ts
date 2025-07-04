@@ -17,7 +17,6 @@ export class I18nContentTranslation {
   @ApiProperty({
     type: String,
   })
-  @IsNotEmpty()
   @IsString()
   content: string
 }

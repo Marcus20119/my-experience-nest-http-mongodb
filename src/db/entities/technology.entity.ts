@@ -69,6 +69,11 @@ export class Technology extends BaseEntity {
   slug: string
 
   @Prop({
+    type: String,
+  })
+  search: string
+
+  @Prop({
     enum: TechnologyType,
     required: true,
     type: String,

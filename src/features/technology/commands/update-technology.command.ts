@@ -62,8 +62,8 @@ export class UpdateTechnologyCommandHandler
       if (name) {
         const existedTechnology = await this.technologyModel
           .findOne({
+            $or: [{ name }, { slug: convertSlug(name) }],
             _id: { $ne: id },
-            name,
           })
           .session(session)
 
@@ -86,6 +86,7 @@ export class UpdateTechnologyCommandHandler
           iconUrl,
           name,
           rate,
+          search: name ? convertSlug(name) : undefined,
           slug: name ? convertSlug(name) : undefined,
           technologySectionId,
           technologyType,

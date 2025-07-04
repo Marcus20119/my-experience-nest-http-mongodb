@@ -49,8 +49,10 @@ export class CreateTechnologySectionCommandHandler
     const { input } = command
     const { name, technologyType } = input
 
+    const slug = convertSlug(name.original)
+
     const existedTechnologySection = await this.technologySectionModel.findOne({
-      'name.original': name.original,
+      $and: [{ $or: [{ 'name.original': name.original }, { slug }] }, { technologyType }],
     })
 
     if (existedTechnologySection) {
@@ -59,7 +61,8 @@ export class CreateTechnologySectionCommandHandler
 
     const newTechnologySection = await this.technologySectionModel.create({
       name,
-      slug: convertSlug(joinDisplayName(name)),
+      search: convertSlug(joinDisplayName(name)),
+      slug,
       technologyType,
     })
 

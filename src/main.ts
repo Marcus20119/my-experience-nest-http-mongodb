@@ -17,7 +17,11 @@ import { AppModule } from './app.module'
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter(), {
-    cors: { origin: true },
+    cors: {
+      credentials: true,
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+      origin: ['http://localhost:3002'],
+    },
     logger: WinstonModule.createLogger({
       format: winston.format.combine(
         winston.format.timestamp(),

@@ -134,9 +134,11 @@ export class CreateTechnologyCommandHandler
     session.startTransaction()
 
     try {
+      const slug = convertSlug(name)
+
       const existedTechnology = await this.technologyModel
         .findOne({
-          name,
+          $or: [{ name }, { slug }],
         })
         .session(session)
 
@@ -154,7 +156,8 @@ export class CreateTechnologyCommandHandler
         iconUrl,
         name,
         rate,
-        slug: convertSlug(name),
+        search: convertSlug(name),
+        slug,
         technologySectionId,
         technologyType,
       })
