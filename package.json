@@ -1,6 +1,8 @@
 {
   "author": "Long Nguyen (Marcus)",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.842.0",
+    "@aws-sdk/s3-request-presigner": "^3.842.0",
     "@fastify/static": "^8.2.0",
     "@nestjs/axios": "^4.0.0",
     "@nestjs/bullmq": "^11.0.2",

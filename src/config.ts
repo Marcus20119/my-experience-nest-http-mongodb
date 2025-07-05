@@ -1,7 +1,8 @@
 import 'dotenv/config'
 
 import { APP_ENV } from '@/common/constants'
-import { parseRedisOptionsFromUrl } from '@/common/utils'
+
+import { BucketType } from './common/enums'
 
 export const config = {
   app: {
@@ -13,37 +14,16 @@ export const config = {
   aws: {
     accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
     region: process.env.AWS_REGION ?? 'ap-southeast-1',
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
-    ses: {
-      from: process.env.AWS_SES_FROM!,
+    s3: {
+      bucket: {
+        [BucketType.PRIVATE]: process.env.AWS_S3_PRIVATE_BUCKET!,
+        [BucketType.PUBLIC]: process.env.AWS_S3_PUBLIC_BUCKET!,
+      },
+      preSignUrlExpiration: Number(process.env.AWS_S3_PRE_SIGN_URL_EXPIRATION ?? 900), // 15 minutes,
     },
-    sqs: process.env.QUEUE_URL_EXPORT_EXCEL,
-  },
-  bcrypt: {
-    salt: Number.parseInt(process.env.SALT_ROUND as string) || 5,
-  },
-  fraxionConfig: {
-    apiUrl: process.env.FRAXION_API_URL,
-    password: process.env.FRAXION_AUTH_PASSWORD as string,
-    username: process.env.FRAXION_AUTH_USERNAME as string,
-  },
-  jwt: {
-    accessTokenTtl: Number(process.env.JWT_ACCESS_TOKEN_TTL ?? 5 * 60), //  5 minutes
-    refreshTokenTtl: Number(process.env.JWT_REFRESH_TOKEN_TTL ?? 7 * 24 * 60 * 60), // 7 days
-    secret: process.env.JWT_SECRET!,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
   },
   mongo: {
     url: process.env.MONGO_URL!,
   },
-  redis: {
-    url: new URL(process.env.REDIS_URL ?? 'redis://localhost:6379/0'),
-  },
-  sentry: {
-    dsn: process.env.SENTRY_DSN,
-  },
-  worker: {
-    apiUrl: process.env.ZONE_CRAWLER_URL,
-  },
 }
-
-export const redisOptions = parseRedisOptionsFromUrl(config.redis.url)
