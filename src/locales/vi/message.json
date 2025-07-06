@@ -1,11 +1,16 @@
 {
+  "aws": {
+    "s3": {
+      "invalidFileType": "Invalid file type",
+      "maxSizeExceeded": "Max size exceeded {{maxSize}} MB"
+    }
+  },
   "base": {
     "actionDenied": "You don't have permission to perform this action!",
     "badRequest": "Bad request",
     "forbidden": "Forbidden",
     "formatOrderIncorrect": "Format order incorrect",
     "incorrectPhoneNumber": "Incorrect phone number",
-    "invalidFilePath": "Invalid file path",
     "invalidIdParam": "Param id is invalid",
     "notFound": "Not found",
     "requiredIdParam": "Param id is required"
