@@ -5,6 +5,7 @@ import { API_VERSION, APP_ENV } from '@/common/constants'
 import { config } from '@/config'
 import { TechnologyModule } from '@/features/technology/technology.module'
 import { TechnologySectionModule } from '@/features/technology-section/technology-section.module'
+import { S3Module } from '@/services/aws/s3/s3.module'
 
 import { version } from '../../../../package.json'
 
@@ -25,10 +26,19 @@ export function swaggerSetup(app: INestApplication) {
     include: [TechnologySectionModule, TechnologyModule],
   })
 
+  const storageDocument = SwaggerModule.createDocument(app, commonConfig, {
+    ignoreGlobalPrefix: true,
+    include: [S3Module],
+  })
+
   const httpAdapter = app.getHttpAdapter()
 
   httpAdapter.get('/technology-docs-json', (request, response) => {
     return response.send(technologyDocument)
+  })
+
+  httpAdapter.get('/storage-docs-json', (request, response) => {
+    return response.send(storageDocument)
   })
 
   SwaggerModule.setup('docs', app, globalDocument, {
@@ -38,6 +48,10 @@ export function swaggerSetup(app: INestApplication) {
         {
           name: 'Technology Module',
           url: '/technology-docs-json',
+        },
+        {
+          name: 'Storage Module',
+          url: '/storage-docs-json',
         },
       ],
     },

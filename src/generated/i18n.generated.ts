@@ -6,13 +6,18 @@ import { Path } from "nestjs-i18n";
 /* prettier-ignore */
 export type I18nTranslations = {
     "message": {
+        "aws": {
+            "s3": {
+                "invalidFileType": string;
+                "maxSizeExceeded": string;
+            };
+        };
         "base": {
             "actionDenied": string;
             "badRequest": string;
             "forbidden": string;
             "formatOrderIncorrect": string;
             "incorrectPhoneNumber": string;
-            "invalidFilePath": string;
             "invalidIdParam": string;
             "notFound": string;
             "requiredIdParam": string;

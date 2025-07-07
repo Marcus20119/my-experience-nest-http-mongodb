@@ -7,6 +7,7 @@ import { TechnologyModule } from './features/technology/technology.module'
 import { TechnologySectionModule } from './features/technology-section/technology-section.module'
 import { DatabaseModule } from './modules/database.module'
 import { LocalizationModule } from './modules/localization.module'
+import { S3Module } from './services/aws/s3/s3.module'
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { LocalizationModule } from './modules/localization.module'
     LocalizationModule,
     RequestContextModule,
     DatabaseModule,
+    S3Module,
 
     // Feature Modules
     TechnologySectionModule,
