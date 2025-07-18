@@ -74,3 +74,6 @@ docker-compose.yml
 
 # Http testing
 *.http
+
+# Pem files
+*.pem

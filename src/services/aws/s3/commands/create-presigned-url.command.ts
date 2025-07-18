@@ -1,5 +1,5 @@
 import { PutObjectCommand } from '@aws-sdk/client-s3'
-import { getSignedUrl as getPreSignedUrl } from '@aws-sdk/s3-request-presigner'
+import { getSignedUrl as getPresignedUrl } from '@aws-sdk/s3-request-presigner'
 import { BadRequestException } from '@nestjs/common'
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { ApiProperty } from '@nestjs/swagger'
@@ -10,10 +10,10 @@ import { t } from '@/common/utils'
 import { config } from '@/config'
 
 import { FILE_CATEGORY_CONFIG } from '../core/constants/s3.constant'
-import { PreSignedUrlResponse } from '../core/interfaces/s3.interface'
+import { PresignedUrlResponse } from '../core/interfaces/s3.interface'
 import { S3Service } from '../s3.service'
 
-export class CreatePreSignedUrlInput {
+export class CreatePresignedUrlInput {
   @ApiProperty({
     enum: BucketType,
     enumName: 'BucketType',
@@ -54,17 +54,17 @@ export class CreatePreSignedUrlInput {
   size: number
 }
 
-export class CreatePreSignedUrlCommand {
-  constructor(public input: CreatePreSignedUrlInput) {}
+export class CreatePresignedUrlCommand {
+  constructor(public input: CreatePresignedUrlInput) {}
 }
 
-@CommandHandler(CreatePreSignedUrlCommand)
-export class CreatePreSignedUrlCommandHandler
-  implements ICommandHandler<CreatePreSignedUrlCommand>
+@CommandHandler(CreatePresignedUrlCommand)
+export class CreatePresignedUrlCommandHandler
+  implements ICommandHandler<CreatePresignedUrlCommand>
 {
   constructor(private readonly s3Service: S3Service) {}
 
-  async execute(command: CreatePreSignedUrlCommand): Promise<PreSignedUrlResponse> {
+  async execute(command: CreatePresignedUrlCommand): Promise<PresignedUrlResponse> {
     const { bucketType, category, mimeType, size } = command.input
 
     const { maxSize, mimeTypes } = FILE_CATEGORY_CONFIG[bucketType][category]
@@ -78,9 +78,9 @@ export class CreatePreSignedUrlCommandHandler
     }
 
     const name = this.s3Service.encodeFileName(command.input.name)
-    const filePath = `${category}/${name}`
+    const filePath = `temp/${category}/${name}`
 
-    const uploadUrl = await getPreSignedUrl(
+    const uploadUrl = await getPresignedUrl(
       this.s3Service.client,
       new PutObjectCommand({
         Bucket: config.aws.s3.bucket[bucketType],

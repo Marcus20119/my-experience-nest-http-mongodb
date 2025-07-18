@@ -1,8 +1,10 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import { IsEnum, IsMongoId, IsOptional } from 'class-validator'
 
 import { Technology } from '@/db/entities/technology.entity'
 
-import { IconType } from '../enums'
+import { IconType, TechnologyType } from '../enums'
+import { RawFilterDto } from '../types'
 
 export class BaseTechnologyResponse {
   @ApiProperty({
@@ -81,4 +83,22 @@ export class BaseTechnologyResponse {
     this.rate = technology.rate
     this.slug = technology.slug
   }
+}
+
+export class TechnologyQueryFilter implements RawFilterDto {
+  @ApiPropertyOptional({
+    enum: TechnologyType,
+    enumName: 'TechnologyType',
+    type: String,
+  })
+  @IsOptional()
+  @IsEnum(TechnologyType)
+  technologyType?: TechnologyType
+
+  @ApiPropertyOptional({
+    type: String,
+  })
+  @IsOptional()
+  @IsMongoId()
+  technologySectionId?: string
 }

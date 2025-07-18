@@ -1,8 +1,8 @@
-import { S3Client } from '@aws-sdk/client-s3'
+import { CopyObjectCommand, CopyObjectCommandInput, S3Client } from '@aws-sdk/client-s3'
 import { Injectable } from '@nestjs/common'
 
-import { config } from '@/config'
 import { BucketType, FileCategory } from '@/common/enums'
+import { config } from '@/config'
 
 @Injectable()
 export class S3Service {
@@ -28,15 +28,29 @@ export class S3Service {
 
   decodeFileKey = (fileKey: string) => {
     if (!/^\w+\|(.+\/).+$/.test(fileKey)) {
-      return { bucketType: undefined, key: undefined, category: undefined }
+      return { bucketType: undefined, category: undefined, key: undefined }
     }
 
-    const [bucketType, key] = fileKey.split('|')
+    const [bucketType, keyAndUrl] = fileKey.split('|')
+    const [key, url] = keyAndUrl.split('>')
 
     return {
       bucketType,
-      key,
       category: bucketType === BucketType.PUBLIC ? key.split('/')[0] : key.split('/')[1],
-    } as { bucketType: BucketType; key: string; category: FileCategory }
+      key,
+      url,
+    } as { bucketType: BucketType; key: string; category: FileCategory; url?: string }
+  }
+
+  async copyObject({ bucketType, key }: { bucketType: BucketType; key: string }): Promise<void> {
+    const bucket = config.aws.s3.bucket[bucketType]
+    const input: CopyObjectCommandInput = {
+      Bucket: bucket,
+      CopySource: `${bucket}/${key}`,
+      Key: key.replace('temp/', 'asset/'),
+    }
+
+    const command = new CopyObjectCommand(input)
+    await this.client.send(command)
   }
 }

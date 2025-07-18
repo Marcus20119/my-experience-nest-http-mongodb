@@ -2,6 +2,7 @@ import { IQueryHandler, QueryHandler } from '@nestjs/cqrs'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 
+import { TechnologyQueryFilter } from '@/common/interfaces'
 import { IPaginatedResponse, OrderDto, PaginationDto } from '@/common/types'
 import DBCommand from '@/common/utils/command'
 import BuildQuery from '@/common/utils/helper'
@@ -13,6 +14,7 @@ import { TechnologyResponse } from '../core/interfaces/technology.interface'
 export class ListTechnologyQueryInput {
   constructor(
     public params: {
+      filter: TechnologyQueryFilter
       pagination: PaginationDto
       orderBy: OrderDto
     },
@@ -46,12 +48,25 @@ export class ListTechnologyQueryHandler implements IQueryHandler<ListTechnologyQ
   }
 
   private async handleFilter(command: ListTechnologyQueryInput) {
-    const { orderBy, pagination } = command.params
+    const { filter, orderBy, pagination } = command.params
 
     const payload = BuildQuery.getManyRequest({
+      filter,
       orderBy,
       pagination,
     })
+
+    if (filter.technologyType) {
+      payload.filters.technologyType = {
+        $eq: filter.technologyType,
+      }
+    }
+
+    if (filter.technologySectionId) {
+      payload.filters.technologySectionId = {
+        $eq: filter.technologySectionId,
+      }
+    }
 
     return payload
   }

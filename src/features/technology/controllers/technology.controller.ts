@@ -10,9 +10,10 @@ import {
   Query,
 } from '@nestjs/common'
 import { CommandBus, QueryBus } from '@nestjs/cqrs'
-import { ApiOperation, ApiTags } from '@nestjs/swagger'
+import { ApiExtraModels, ApiOperation, ApiTags } from '@nestjs/swagger'
 
 import { RequiredId } from '@/common/decorators'
+import { TechnologyQueryFilter } from '@/common/interfaces'
 import { ApiSuccessPaginatedResponse, ApiSuccessResponse } from '@/common/libs/swagger'
 import { OrderDto, PaginationDto } from '@/common/types'
 
@@ -66,11 +67,17 @@ export class TechnologyController {
   }
 
   @Get()
+  @ApiExtraModels(TechnologyQueryFilter)
   @ApiOperation({ summary: 'Get list technologies' })
   @ApiSuccessPaginatedResponse({ type: TechnologyResponse })
-  async getListTechnologies(@Query() pagination: PaginationDto, @Query() orderBy: OrderDto) {
+  async getListTechnologies(
+    @Query() filter: TechnologyQueryFilter,
+    @Query() pagination: PaginationDto,
+    @Query() orderBy: OrderDto,
+  ) {
     return await this.queryBus.execute(
       new ListTechnologyQueryInput({
+        filter,
         orderBy,
         pagination,
       }),

@@ -27,7 +27,11 @@ export class TechnologySectionSkeletonQueryHandler
     const types = Object.values(TechnologyType)
 
     const queries = types.map(async (type) => {
-      const sections = await this.technologySectionModel.find({ technologyType: type })
+      const sections = await this.technologySectionModel
+        .find({ technologyType: type })
+        .limit(100)
+        .skip(0)
+        .sort({ createdAt: 1 })
 
       return {
         technologySections: sections.map((section) => new BaseTechnologySectionResponse(section)),

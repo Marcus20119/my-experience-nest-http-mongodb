@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger'
 
-export class PreSignedUrlResponse {
+export class PresignedUrlResponse {
   @ApiProperty({
     type: String,
   })

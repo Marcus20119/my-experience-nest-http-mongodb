@@ -9,6 +9,8 @@ import { IsStepInRange } from '@/common/decorators'
 import { IconType, SyncAction, TechnologyType } from '@/common/enums'
 import { convertSlug, t } from '@/common/utils'
 import { Technology, TechnologySection } from '@/db/entities'
+import { CloudfrontService } from '@/services/aws/cloud-front/cloudfront.service'
+import { S3Service } from '@/services/aws/s3/s3.service'
 
 import { TechnologyResponse } from '../core/interfaces/technology.interface'
 import { BaseTechnologyCommand } from './base-technology.command'
@@ -84,7 +86,7 @@ export class CreateTechnologyInput {
   @IsEnum(TechnologyType)
   technologyType: TechnologyType
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     type: String,
   })
   @IsOptional()
@@ -108,6 +110,8 @@ export class CreateTechnologyCommandHandler
     protected readonly technologySectionModel: Model<TechnologySection>,
     @InjectConnection()
     private readonly connection: Connection,
+    private readonly s3Service: S3Service,
+    private readonly cloudfrontService: CloudfrontService,
   ) {
     super(technologySectionModel)
   }
@@ -144,6 +148,18 @@ export class CreateTechnologyCommandHandler
 
       if (existedTechnology) {
         throw new BadRequestException(t('message.technology.existed'))
+      }
+
+      if (iconUrl) {
+        const { bucketType, key } = this.s3Service.decodeFileKey(iconUrl)
+
+        if (bucketType && key) {
+          console.log('🚀 ~ execute ~ key:', key)
+          await this.s3Service.copyObject({
+            bucketType,
+            key,
+          })
+        }
       }
 
       const newTechnology = new this.technologyModel({

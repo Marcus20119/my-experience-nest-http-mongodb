@@ -13,6 +13,15 @@ export const config = {
   },
   aws: {
     accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
+    cloudfront: {
+      distribution: {
+        [BucketType.PRIVATE]: process.env.AWS_CLOUDFRONT_PRIVATE_DISTRIBUTION,
+        [BucketType.PUBLIC]: process.env.AWS_CLOUDFRONT_PUBLIC_DISTRIBUTION,
+      },
+      keyPairId: process.env.AWS_CLOUDFRONT_KEY_PAIR_ID ?? '',
+      privateKey: process.env.AWS_CLOUDFRONT_PRIVATE_KEY ?? '',
+      signUrlExpiration: Number(process.env.AWS_CLOUDFRONT_SIGN_URL_EXPIRATION ?? 900), // 15 minutes
+    },
     region: process.env.AWS_REGION ?? 'ap-southeast-1',
     s3: {
       bucket: {

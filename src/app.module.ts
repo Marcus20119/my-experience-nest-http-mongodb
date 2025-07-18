@@ -7,6 +7,7 @@ import { TechnologyModule } from './features/technology/technology.module'
 import { TechnologySectionModule } from './features/technology-section/technology-section.module'
 import { DatabaseModule } from './modules/database.module'
 import { LocalizationModule } from './modules/localization.module'
+import { CloudfrontModule } from './services/aws/cloud-front/cloudfront.module'
 import { S3Module } from './services/aws/s3/s3.module'
 
 @Module({
@@ -18,6 +19,7 @@ import { S3Module } from './services/aws/s3/s3.module'
     RequestContextModule,
     DatabaseModule,
     S3Module,
+    CloudfrontModule,
 
     // Feature Modules
     TechnologySectionModule,
