@@ -5,9 +5,13 @@ import { IconType, SyncAction } from '@/common/enums'
 import { BaseTechnologyResponse } from '@/common/interfaces'
 import { t } from '@/common/utils'
 import { Technology, TechnologySection } from '@/db/entities'
+import { CloudfrontService } from '@/services/aws/cloud-front/cloudfront.service'
 
 export class BaseTechnologyCommand {
-  constructor(protected readonly technologySectionModel: Model<TechnologySection>) {}
+  constructor(
+    protected readonly technologySectionModel: Model<TechnologySection>,
+    protected readonly cloudfrontService: CloudfrontService,
+  ) {}
 
   protected verifyIcon(technology?: Partial<Technology>): void {
     if (!technology) {
@@ -111,7 +115,7 @@ export class BaseTechnologyCommand {
       throw new BadRequestException(t('message.technologySection.notFound'))
     }
 
-    section.technologies.push(new BaseTechnologyResponse(technology))
+    section.technologies.push(new BaseTechnologyResponse(technology, this.cloudfrontService))
     await section.save({
       session,
     })

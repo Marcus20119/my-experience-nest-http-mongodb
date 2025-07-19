@@ -14,8 +14,11 @@ import { ListTechnologyQueryHandler } from './queries/list-technology.query'
   controllers: [TechnologyController],
   imports: [S3Module, CloudfrontModule],
   providers: [
+    // Queries
     ListTechnologyQueryHandler,
     DetailTechnologyQueryHandler,
+
+    // Commands
     CreateTechnologyCommandHandler,
     UpdateTechnologyCommandHandler,
     DeleteTechnologyCommandHandler,

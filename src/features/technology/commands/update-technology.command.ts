@@ -7,6 +7,7 @@ import { Connection, Model } from 'mongoose'
 import { SyncAction } from '@/common/enums'
 import { convertSlug, t } from '@/common/utils'
 import { Technology, TechnologySection } from '@/db/entities'
+import { CloudfrontService } from '@/services/aws/cloud-front/cloudfront.service'
 
 import { TechnologyResponse } from '../core/interfaces/technology.interface'
 import { BaseTechnologyCommand } from './base-technology.command'
@@ -31,10 +32,11 @@ export class UpdateTechnologyCommandHandler
     protected readonly technologyModel: Model<Technology>,
     @InjectModel(TechnologySection.name)
     protected readonly technologySectionModel: Model<TechnologySection>,
+    protected readonly cloudfrontService: CloudfrontService,
     @InjectConnection()
     private readonly connection: Connection,
   ) {
-    super(technologySectionModel)
+    super(technologySectionModel, cloudfrontService)
   }
 
   async execute(command: UpdateTechnologyCommand): Promise<TechnologyResponse> {
@@ -120,7 +122,7 @@ export class UpdateTechnologyCommandHandler
       }
 
       await session.commitTransaction()
-      return new TechnologyResponse(updatedTechnology)
+      return new TechnologyResponse(updatedTechnology, this.cloudfrontService)
     } catch (error) {
       await session.abortTransaction()
       throw error

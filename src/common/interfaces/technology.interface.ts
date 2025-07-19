@@ -2,6 +2,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import { IsEnum, IsMongoId, IsOptional } from 'class-validator'
 
 import { Technology } from '@/db/entities/technology.entity'
+import { CloudfrontService } from '@/services/aws/cloud-front/cloudfront.service'
 
 import { IconType, TechnologyType } from '../enums'
 import { RawFilterDto } from '../types'
@@ -70,7 +71,7 @@ export class BaseTechnologyResponse {
   })
   slug: string
 
-  constructor(technology: Technology) {
+  constructor(technology: Technology, cloudfrontService: CloudfrontService) {
     this.id = technology.id
     this.name = technology.name
     this.iconType = technology.iconType
@@ -82,6 +83,10 @@ export class BaseTechnologyResponse {
     this.description = technology.description
     this.rate = technology.rate
     this.slug = technology.slug
+
+    if (this.iconUrl) {
+      this.iconUrl = cloudfrontService.getSignedUrl(this.iconUrl)
+    }
   }
 }
 

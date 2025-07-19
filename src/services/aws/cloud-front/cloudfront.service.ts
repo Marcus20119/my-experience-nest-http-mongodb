@@ -9,7 +9,9 @@ import { S3Service } from '../s3/s3.service'
 export class CloudfrontService {
   constructor(private readonly s3Service: S3Service) {}
 
-  async getSignedUrl(fileKey: string): Promise<string> {
+  getSignedUrl(fileKey?: string): string | undefined {
+    if (!fileKey) return undefined
+
     const { bucketType, key } = this.s3Service.decodeFileKey(fileKey)
 
     if (!bucketType || !key) {
@@ -41,11 +43,13 @@ export class CloudfrontService {
       ],
     }
 
-    return getCloudFrontSignedUrl({
+    const signedUrl = getCloudFrontSignedUrl({
       keyPairId: config.aws.cloudfront.keyPairId,
       policy: JSON.stringify(policy),
       privateKey: config.aws.cloudfront.privateKey,
       url,
     })
+
+    return `${bucketType}|${key}>${signedUrl}`
   }
 }

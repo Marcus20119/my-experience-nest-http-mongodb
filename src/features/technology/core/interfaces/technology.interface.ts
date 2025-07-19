@@ -7,6 +7,7 @@ import {
   BaseTechnologyResponse,
 } from '@/common/interfaces'
 import { Technology } from '@/db/entities'
+import { CloudfrontService } from '@/services/aws/cloud-front/cloudfront.service'
 
 export class TechnologyResponse extends BaseTechnologyResponse {
   @ApiPropertyOptional({
@@ -35,8 +36,8 @@ export class TechnologyResponse extends BaseTechnologyResponse {
   })
   knowledgeItems: BaseKnowledgeItemResponse[]
 
-  constructor(technology: Technology) {
-    super(technology)
+  constructor(technology: Technology, cloudfrontService: CloudfrontService) {
+    super(technology, cloudfrontService)
     this.type = technology.technologyType
     this.technologySectionId = technology.technologySectionId
     this.knowledgeGroups = technology.knowledgeGroups

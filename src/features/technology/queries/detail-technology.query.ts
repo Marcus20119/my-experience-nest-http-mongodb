@@ -5,6 +5,7 @@ import { Model } from 'mongoose'
 
 import { t } from '@/common/utils'
 import { Technology } from '@/db/entities'
+import { CloudfrontService } from '@/services/aws/cloud-front/cloudfront.service'
 
 import { TechnologyResponse } from '../core/interfaces/technology.interface'
 
@@ -15,6 +16,7 @@ export class DetailTechnologyQuery {
 @QueryHandler(DetailTechnologyQuery)
 export class DetailTechnologyQueryHandler implements IQueryHandler<DetailTechnologyQuery> {
   constructor(
+    protected readonly cloudfrontService: CloudfrontService,
     @InjectModel(Technology.name)
     private readonly technologyModel: Model<Technology>,
   ) {}
@@ -26,6 +28,6 @@ export class DetailTechnologyQueryHandler implements IQueryHandler<DetailTechnol
       throw new BadRequestException(t('message.technology.notFound'))
     }
 
-    return new TechnologyResponse(technology)
+    return new TechnologyResponse(technology, this.cloudfrontService)
   }
 }

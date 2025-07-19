@@ -8,6 +8,7 @@ import DBCommand from '@/common/utils/command'
 import BuildQuery from '@/common/utils/helper'
 import PaginationHelper from '@/common/utils/pagination-helper'
 import { Technology } from '@/db/entities'
+import { CloudfrontService } from '@/services/aws/cloud-front/cloudfront.service'
 
 import { TechnologyResponse } from '../core/interfaces/technology.interface'
 
@@ -24,6 +25,7 @@ export class ListTechnologyQueryInput {
 @QueryHandler(ListTechnologyQueryInput)
 export class ListTechnologyQueryHandler implements IQueryHandler<ListTechnologyQueryInput> {
   constructor(
+    protected readonly cloudfrontService: CloudfrontService,
     @InjectModel(Technology.name)
     private readonly technologyModel: Model<Technology>,
   ) {}
@@ -37,7 +39,9 @@ export class ListTechnologyQueryHandler implements IQueryHandler<ListTechnologyQ
 
     const { items, total } = await DBCommand.runGetMany<Technology>(this.technologyModel, payload)
 
-    const results = await Promise.all(items.map(async (i) => new TechnologyResponse(i)))
+    const results = await Promise.all(
+      items.map(async (i) => new TechnologyResponse(i, this.cloudfrontService)),
+    )
 
     return PaginationHelper.pagination({
       items: results,

@@ -6,6 +6,7 @@ import { Connection, Model } from 'mongoose'
 import { SyncAction } from '@/common/enums'
 import { t } from '@/common/utils'
 import { Technology, TechnologySection } from '@/db/entities'
+import { CloudfrontService } from '@/services/aws/cloud-front/cloudfront.service'
 
 import { BaseTechnologyCommand } from './base-technology.command'
 
@@ -23,10 +24,11 @@ export class DeleteTechnologyCommandHandler
     protected readonly technologyModel: Model<Technology>,
     @InjectModel(TechnologySection.name)
     protected readonly technologySectionModel: Model<TechnologySection>,
+    protected readonly cloudfrontService: CloudfrontService,
     @InjectConnection()
     private readonly connection: Connection,
   ) {
-    super(technologySectionModel)
+    super(technologySectionModel, cloudfrontService)
   }
 
   async execute(command: DeleteTechnologyCommand): Promise<void> {

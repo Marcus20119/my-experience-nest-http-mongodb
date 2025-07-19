@@ -19,7 +19,7 @@ export const config = {
         [BucketType.PUBLIC]: process.env.AWS_CLOUDFRONT_PUBLIC_DISTRIBUTION,
       },
       keyPairId: process.env.AWS_CLOUDFRONT_KEY_PAIR_ID ?? '',
-      privateKey: process.env.AWS_CLOUDFRONT_PRIVATE_KEY ?? '',
+      privateKey: process.env.AWS_CLOUDFRONT_PRIVATE_KEY?.replace(/\\n/g, '\n') ?? '',
       signUrlExpiration: Number(process.env.AWS_CLOUDFRONT_SIGN_URL_EXPIRATION ?? 900), // 15 minutes
     },
     region: process.env.AWS_REGION ?? 'ap-southeast-1',

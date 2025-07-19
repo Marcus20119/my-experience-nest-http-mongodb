@@ -108,12 +108,12 @@ export class CreateTechnologyCommandHandler
     protected readonly technologyModel: Model<Technology>,
     @InjectModel(TechnologySection.name)
     protected readonly technologySectionModel: Model<TechnologySection>,
+    protected readonly s3Service: S3Service,
+    protected readonly cloudfrontService: CloudfrontService,
     @InjectConnection()
     private readonly connection: Connection,
-    private readonly s3Service: S3Service,
-    private readonly cloudfrontService: CloudfrontService,
   ) {
-    super(technologySectionModel)
+    super(technologySectionModel, cloudfrontService)
   }
 
   async execute(command: CreateTechnologyCommand): Promise<TechnologyResponse> {
@@ -150,18 +150,6 @@ export class CreateTechnologyCommandHandler
         throw new BadRequestException(t('message.technology.existed'))
       }
 
-      if (iconUrl) {
-        const { bucketType, key } = this.s3Service.decodeFileKey(iconUrl)
-
-        if (bucketType && key) {
-          console.log('🚀 ~ execute ~ key:', key)
-          await this.s3Service.copyObject({
-            bucketType,
-            key,
-          })
-        }
-      }
-
       const newTechnology = new this.technologyModel({
         color1,
         color2,
@@ -169,7 +157,7 @@ export class CreateTechnologyCommandHandler
         description,
         iconName,
         iconType,
-        iconUrl,
+        iconUrl: await this.s3Service.copyObjectFromTempToAsset(iconUrl),
         name,
         rate,
         search: convertSlug(name),
@@ -203,7 +191,7 @@ export class CreateTechnologyCommandHandler
       }
 
       await session.commitTransaction()
-      return new TechnologyResponse(newTechnology)
+      return new TechnologyResponse(newTechnology, this.cloudfrontService)
     } catch (error) {
       await session.abortTransaction()
       throw error

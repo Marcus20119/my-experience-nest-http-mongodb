@@ -26,9 +26,11 @@ export class S3Service {
     return `${bucketType}|${key}`
   }
 
-  decodeFileKey = (fileKey: string) => {
+  decodeFileKey = (
+    fileKey: string,
+  ): { bucketType?: BucketType; key?: string; category?: FileCategory; url?: string } => {
     if (!/^\w+\|(.+\/).+$/.test(fileKey)) {
-      return { bucketType: undefined, category: undefined, key: undefined }
+      return { bucketType: undefined, category: undefined, key: undefined, url: undefined }
     }
 
     const [bucketType, keyAndUrl] = fileKey.split('|')
@@ -42,15 +44,27 @@ export class S3Service {
     } as { bucketType: BucketType; key: string; category: FileCategory; url?: string }
   }
 
-  async copyObject({ bucketType, key }: { bucketType: BucketType; key: string }): Promise<void> {
-    const bucket = config.aws.s3.bucket[bucketType]
-    const input: CopyObjectCommandInput = {
-      Bucket: bucket,
-      CopySource: `${bucket}/${key}`,
-      Key: key.replace('temp/', 'asset/'),
+  async copyObjectFromTempToAsset(fileKey?: string): Promise<string | undefined> {
+    if (!fileKey) return undefined
+
+    const { bucketType, key } = this.decodeFileKey(fileKey)
+
+    if (bucketType && key) {
+      const newKey = key.replace('temp/', 'asset/')
+
+      const bucket = config.aws.s3.bucket[bucketType]
+      const input: CopyObjectCommandInput = {
+        Bucket: bucket,
+        CopySource: `${bucket}/${key}`,
+        Key: newKey,
+      }
+
+      const command = new CopyObjectCommand(input)
+      await this.client.send(command)
+
+      return this.getFileKey(bucketType, newKey)
     }
 
-    const command = new CopyObjectCommand(input)
-    await this.client.send(command)
+    return undefined
   }
 }
