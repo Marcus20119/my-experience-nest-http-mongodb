@@ -1,4 +1,10 @@
-import { CopyObjectCommand, CopyObjectCommandInput, S3Client } from '@aws-sdk/client-s3'
+import {
+  CopyObjectCommand,
+  CopyObjectCommandInput,
+  DeleteObjectCommand,
+  DeleteObjectsCommand,
+  S3Client,
+} from '@aws-sdk/client-s3'
 import { Injectable } from '@nestjs/common'
 
 import { BucketType, FileCategory } from '@/common/enums'
@@ -6,7 +12,7 @@ import { config } from '@/config'
 
 @Injectable()
 export class S3Service {
-  client = new S3Client({
+  private readonly client = new S3Client({
     credentials: {
       accessKeyId: config.aws.accessKeyId,
       secretAccessKey: config.aws.secretAccessKey,
@@ -66,5 +72,49 @@ export class S3Service {
     }
 
     return undefined
+  }
+
+  async deleteFile(fileKey?: string): Promise<void> {
+    if (!fileKey) return
+
+    const { bucketType, key } = this.decodeFileKey(fileKey)
+    if (!bucketType || !key) return
+
+    const bucket = config.aws.s3.bucket[bucketType]
+    const command = new DeleteObjectCommand({
+      Bucket: bucket,
+      Key: key,
+    })
+
+    await this.client.send(command)
+  }
+
+  async deleteFiles(fileKeys: string[]): Promise<void> {
+    const entries = fileKeys
+      .map((fileKey) => this.decodeFileKey(fileKey))
+      .filter((f): f is { bucketType: BucketType; key: string } => !!(f.bucketType && f.key))
+
+    // Group keys by bucketType
+    const bucketMap: Record<BucketType, string[]> = {} as any
+
+    for (const { bucketType, key } of entries) {
+      if (!bucketMap[bucketType]) bucketMap[bucketType] = []
+      bucketMap[bucketType].push(key)
+    }
+
+    for (const bucketType of Object.keys(bucketMap) as BucketType[]) {
+      const keys = bucketMap[bucketType]
+      const bucket = config.aws.s3.bucket[bucketType]
+
+      const command = new DeleteObjectsCommand({
+        Bucket: bucket,
+        Delete: {
+          Objects: keys.map((Key) => ({ Key })),
+          Quiet: true,
+        },
+      })
+
+      await this.client.send(command)
+    }
   }
 }

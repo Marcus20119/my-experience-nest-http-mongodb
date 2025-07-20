@@ -1,5 +1,7 @@
 import { Module } from '@nestjs/common'
 
+import { S3Module } from '@/services/aws/s3/s3.module'
+
 import { CreateTechnologySectionCommandHandler } from './commands/create-technology-section.command'
 import { DeleteTechnologySectionCommandHandler } from './commands/delete-technology-section.command'
 import { UpdateTechnologySectionCommandHandler } from './commands/update-technology-section.command'
@@ -10,6 +12,7 @@ import { TechnologySectionSkeletonQueryHandler } from './queries/technology-sect
 
 @Module({
   controllers: [TechnologySectionController],
+  imports: [S3Module],
   providers: [
     ListTechnologySectionQueryHandler,
     DetailTechnologySectionQueryHandler,

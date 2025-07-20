@@ -26,7 +26,7 @@ export class BaseKnowledgeItemResponse {
   @ApiProperty({
     type: String,
   })
-  iconUrl: string
+  iconFileKey: string
 
   @ApiProperty({
     type: String,
@@ -47,7 +47,7 @@ export class BaseKnowledgeItemResponse {
     this.id = knowledgeItem.id
     this.name = knowledgeItem.name
     this.iconType = knowledgeItem.iconType
-    this.iconUrl = knowledgeItem.iconUrl
+    this.iconFileKey = knowledgeItem.iconFileKey
     this.iconName = knowledgeItem.iconName
     this.color = knowledgeItem.color
     this.rate = knowledgeItem.rate

@@ -7,6 +7,7 @@ import { SyncAction } from '@/common/enums'
 import { t } from '@/common/utils'
 import { Technology, TechnologySection } from '@/db/entities'
 import { CloudfrontService } from '@/services/aws/cloud-front/cloudfront.service'
+import { S3Service } from '@/services/aws/s3/s3.service'
 
 import { BaseTechnologyCommand } from './base-technology.command'
 
@@ -25,6 +26,7 @@ export class DeleteTechnologyCommandHandler
     @InjectModel(TechnologySection.name)
     protected readonly technologySectionModel: Model<TechnologySection>,
     protected readonly cloudfrontService: CloudfrontService,
+    protected readonly s3Service: S3Service,
     @InjectConnection()
     private readonly connection: Connection,
   ) {
@@ -35,12 +37,16 @@ export class DeleteTechnologyCommandHandler
     const session = await this.connection.startSession()
     session.startTransaction()
 
+    let iconFileKey: string | undefined
+
     try {
       const technology = await this.technologyModel.findById(command.id).session(session)
 
       if (!technology) {
         throw new BadRequestException(t('message.technology.notFound'))
       }
+
+      iconFileKey = technology.iconFileKey
 
       await this.syncTechnologySectionInfo({
         session,
@@ -54,6 +60,10 @@ export class DeleteTechnologyCommandHandler
       throw error
     } finally {
       session.endSession()
+    }
+
+    if (iconFileKey) {
+      await this.s3Service.deleteFile(iconFileKey)
     }
   }
 }

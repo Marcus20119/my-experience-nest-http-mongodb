@@ -14,9 +14,13 @@ export const config = {
   aws: {
     accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
     cloudfront: {
-      distribution: {
-        [BucketType.PRIVATE]: process.env.AWS_CLOUDFRONT_PRIVATE_DISTRIBUTION,
-        [BucketType.PUBLIC]: process.env.AWS_CLOUDFRONT_PUBLIC_DISTRIBUTION,
+      distributionId: {
+        [BucketType.PRIVATE]: process.env.AWS_CLOUDFRONT_PRIVATE_DISTRIBUTION_ID!,
+        [BucketType.PUBLIC]: process.env.AWS_CLOUDFRONT_PUBLIC_DISTRIBUTION_ID!,
+      },
+      domain: {
+        [BucketType.PRIVATE]: process.env.AWS_CLOUDFRONT_PRIVATE_DISTRIBUTION_DOMAIN,
+        [BucketType.PUBLIC]: process.env.AWS_CLOUDFRONT_PUBLIC_DISTRIBUTION_DOMAIN,
       },
       keyPairId: process.env.AWS_CLOUDFRONT_KEY_PAIR_ID ?? '',
       privateKey: process.env.AWS_CLOUDFRONT_PRIVATE_KEY?.replace(/\\n/g, '\n') ?? '',

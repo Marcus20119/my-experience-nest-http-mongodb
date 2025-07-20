@@ -23,7 +23,7 @@ export class KnowledgeItem extends BaseEntity {
   @Prop({
     type: String,
   })
-  iconUrl: string
+  iconFileKey: string
 
   @Prop({
     type: String,

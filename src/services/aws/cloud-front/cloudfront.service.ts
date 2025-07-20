@@ -1,3 +1,8 @@
+import {
+  CloudFrontClient,
+  CreateInvalidationCommand,
+  CreateInvalidationCommandInput,
+} from '@aws-sdk/client-cloudfront'
 import { getSignedUrl as getCloudFrontSignedUrl } from '@aws-sdk/cloudfront-signer'
 import { Injectable } from '@nestjs/common'
 
@@ -9,24 +14,26 @@ import { S3Service } from '../s3/s3.service'
 export class CloudfrontService {
   constructor(private readonly s3Service: S3Service) {}
 
+  private readonly client = new CloudFrontClient({
+    credentials: {
+      accessKeyId: config.aws.accessKeyId,
+      secretAccessKey: config.aws.secretAccessKey,
+    },
+    region: config.aws.region,
+  })
+
   getSignedUrl(fileKey?: string): string | undefined {
     if (!fileKey) return undefined
 
     const { bucketType, key } = this.s3Service.decodeFileKey(fileKey)
 
-    if (!bucketType || !key) {
-      // FIX_ME: Handle invalid file key format
-      throw new Error('Invalid file key format')
-    }
+    if (!bucketType || !key) return undefined
 
-    const distribution = config.aws.cloudfront.distribution[bucketType]
+    const domain = config.aws.cloudfront.domain[bucketType]
 
-    if (!distribution) {
-      // FIX_ME: Handle unsupported bucket type
-      throw new Error(`Unsupported bucket type: ${bucketType}`)
-    }
+    if (!domain) return undefined
 
-    const url = `${distribution}/${key}`
+    const url = `${domain}/${key}`
 
     const policy = {
       Statement: [
@@ -51,5 +58,43 @@ export class CloudfrontService {
     })
 
     return `${bucketType}|${key}>${signedUrl}`
+  }
+
+  async invalidateCache(fileKeys: string[]): Promise<void> {
+    if (!fileKeys.length) return
+
+    // Group paths by distribution
+    const distributionMap: Record<string, string[]> = {}
+
+    for (const fileKey of fileKeys) {
+      const { bucketType, key } = this.s3Service.decodeFileKey(fileKey)
+      if (!bucketType || !key) continue
+
+      const distributionId = config.aws.cloudfront.distributionId[bucketType]
+      if (!distributionId) continue
+
+      if (!distributionMap[distributionId]) {
+        distributionMap[distributionId] = []
+      }
+
+      distributionMap[distributionId].push(`/${key}`)
+    }
+
+    // Invalidate by distribution
+    for (const [distributionId, paths] of Object.entries(distributionMap)) {
+      const input: CreateInvalidationCommandInput = {
+        DistributionId: distributionId,
+        InvalidationBatch: {
+          CallerReference: `${Date.now()}`,
+          Paths: {
+            Items: paths,
+            Quantity: paths.length,
+          },
+        },
+      }
+
+      const command = new CreateInvalidationCommand(input)
+      await this.client.send(command)
+    }
   }
 }

@@ -29,7 +29,7 @@ export class BaseTechnologyResponse {
     nullable: true,
     type: String,
   })
-  iconUrl?: string
+  iconFileKey?: string
 
   @ApiPropertyOptional({
     nullable: true,
@@ -75,7 +75,7 @@ export class BaseTechnologyResponse {
     this.id = technology.id
     this.name = technology.name
     this.iconType = technology.iconType
-    this.iconUrl = technology.iconUrl
+    this.iconFileKey = technology.iconFileKey
     this.iconName = technology.iconName
     this.color1 = technology.color1
     this.color2 = technology.color2
@@ -84,8 +84,8 @@ export class BaseTechnologyResponse {
     this.rate = technology.rate
     this.slug = technology.slug
 
-    if (this.iconUrl) {
-      this.iconUrl = cloudfrontService.getSignedUrl(this.iconUrl)
+    if (this.iconFileKey) {
+      this.iconFileKey = cloudfrontService.getSignedUrl(this.iconFileKey)
     }
   }
 }

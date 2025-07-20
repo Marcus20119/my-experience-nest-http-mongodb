@@ -18,7 +18,7 @@ export class BaseTechnologyCommand {
       return
     }
 
-    const { iconName, iconType, iconUrl } = technology
+    const { iconFileKey, iconName, iconType } = technology
 
     switch (iconType) {
       case IconType.Iconify: {
@@ -29,7 +29,7 @@ export class BaseTechnologyCommand {
       }
 
       case IconType.Custom: {
-        if (!iconUrl) {
+        if (!iconFileKey) {
           throw new BadRequestException(t('message.technology.shouldContainIconUrl'))
         }
         break

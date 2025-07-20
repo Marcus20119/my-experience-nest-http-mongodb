@@ -24,7 +24,7 @@ export class Technology extends BaseEntity {
   @Prop({
     type: String,
   })
-  iconUrl?: string
+  iconFileKey?: string
 
   @Prop({
     type: String,

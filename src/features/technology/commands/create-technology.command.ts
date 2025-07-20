@@ -35,7 +35,7 @@ export class CreateTechnologyInput {
     type: String,
   })
   @IsOptional()
-  iconUrl?: string
+  iconFileKey?: string
 
   @ApiPropertyOptional({
     type: String,
@@ -125,7 +125,7 @@ export class CreateTechnologyCommandHandler
       description,
       iconName,
       iconType,
-      iconUrl,
+      iconFileKey,
       name,
       rate,
       technologySectionId,
@@ -157,7 +157,7 @@ export class CreateTechnologyCommandHandler
         description,
         iconName,
         iconType,
-        iconUrl: await this.s3Service.copyObjectFromTempToAsset(iconUrl),
+        iconFileKey: await this.s3Service.copyObjectFromTempToAsset(iconFileKey),
         name,
         rate,
         search: convertSlug(name),
