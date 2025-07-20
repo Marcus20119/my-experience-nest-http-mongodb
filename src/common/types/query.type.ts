@@ -10,43 +10,55 @@ export class RangeNumberQueryDto {
 
   @IsOptional()
   @IsNumber()
-  @ApiPropertyOptional({ nullable: true })
-  eq: number
+  @ApiPropertyOptional({
+    type: Number,
+  })
+  eq?: number
 
   @IsOptional()
   @IsNumber()
-  @ApiPropertyOptional({ nullable: true })
-  ne: number
+  @ApiPropertyOptional({
+    type: Number,
+  })
+  ne?: number
 
   @IsOptional()
   @IsNumber()
-  @ApiPropertyOptional({ nullable: true })
-  gte: number
+  @ApiPropertyOptional({
+    type: Number,
+  })
+  gte?: number
 
   @IsOptional()
   @IsNumber()
-  @ApiPropertyOptional({ nullable: true })
-  lte: number
+  @ApiPropertyOptional({
+    type: Number,
+  })
+  lte?: number
 
   @IsOptional()
   @IsNumber()
-  @ApiPropertyOptional({ nullable: true })
-  gt: number
+  @ApiPropertyOptional({
+    type: Number,
+  })
+  gt?: number
 
   @IsOptional()
   @IsNumber()
-  @ApiPropertyOptional({ nullable: true })
-  lt: number;
+  @ApiPropertyOptional({
+    type: Number,
+  })
+  lt?: number;
 
   @IsOptional()
   @IsArray()
-  @ApiPropertyOptional({ nullable: true, type: [Number] })
-  in: number[]
+  @ApiPropertyOptional({ type: [Number] })
+  in?: number[]
 
   @IsOptional()
   @IsArray()
-  @ApiPropertyOptional({ nullable: true, type: [Number] })
-  nin: number[]
+  @ApiPropertyOptional({ type: [Number] })
+  nin?: number[]
 }
 
 export class RangeDateQueryDto {
@@ -57,43 +69,55 @@ export class RangeDateQueryDto {
 
   @IsOptional()
   @IsDateString()
-  @ApiPropertyOptional({ nullable: true })
-  eq: Date
+  @ApiPropertyOptional({
+    type: Date,
+  })
+  eq?: Date
 
   @IsOptional()
   @IsDateString()
-  @ApiPropertyOptional({ nullable: true })
-  ne: Date
+  @ApiPropertyOptional({
+    type: Date,
+  })
+  ne?: Date
 
   @IsOptional()
   @IsDateString()
-  @ApiPropertyOptional({ nullable: true })
-  gte: Date
+  @ApiPropertyOptional({
+    type: Date,
+  })
+  gte?: Date
 
   @IsOptional()
   @IsDateString()
-  @ApiPropertyOptional({ nullable: true })
-  lte: Date
+  @ApiPropertyOptional({
+    type: Date,
+  })
+  lte?: Date
 
   @IsOptional()
   @IsDateString()
-  @ApiPropertyOptional({ nullable: true })
-  gt: Date
+  @ApiPropertyOptional({
+    type: Date,
+  })
+  gt?: Date
 
   @IsOptional()
   @IsDateString()
-  @ApiPropertyOptional({ nullable: true })
-  lt: Date;
+  @ApiPropertyOptional({
+    type: Date,
+  })
+  lt?: Date;
 
   @IsOptional()
   @IsArray()
-  @ApiPropertyOptional({ nullable: true, type: [Date] })
-  in: Date[]
+  @ApiPropertyOptional({ type: [Date] })
+  in?: Date[]
 
   @IsOptional()
   @IsArray()
-  @ApiPropertyOptional({ nullable: true, type: [Date] })
-  nin: Date[]
+  @ApiPropertyOptional({ type: [Date] })
+  nin?: Date[]
 }
 
 export class RangeStringQueryDto {
@@ -104,42 +128,42 @@ export class RangeStringQueryDto {
 
   @IsOptional()
   @IsString()
-  @ApiPropertyOptional({ nullable: true })
+  @ApiPropertyOptional({ type: String })
   eq?: string
 
   @IsOptional()
   @IsString()
-  @ApiPropertyOptional({ nullable: true })
+  @ApiPropertyOptional({ type: String })
   ne?: string
 
   @IsOptional()
   @IsString()
-  @ApiPropertyOptional({ nullable: true })
+  @ApiPropertyOptional({ type: String })
   gte?: string
 
   @IsOptional()
   @IsString()
-  @ApiPropertyOptional({ nullable: true })
+  @ApiPropertyOptional({ type: String })
   lte?: string
 
   @IsOptional()
   @IsString()
-  @ApiPropertyOptional({ nullable: true })
+  @ApiPropertyOptional({ type: String })
   gt?: string
 
   @IsOptional()
   @IsString()
-  @ApiPropertyOptional({ nullable: true })
+  @ApiPropertyOptional({ type: String })
   lt?: string;
 
   @IsOptional()
   @IsString({ each: true })
-  @ApiPropertyOptional({ nullable: true, type: [String] })
+  @ApiPropertyOptional({ type: [String] })
   in?: string[]
 
   @IsOptional()
   @IsString({ each: true })
-  @ApiPropertyOptional({ nullable: true, type: [String] })
+  @ApiPropertyOptional({ type: [String] })
   nin?: string[]
 }
 

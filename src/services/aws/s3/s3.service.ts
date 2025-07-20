@@ -8,11 +8,12 @@ import {
 import { Injectable } from '@nestjs/common'
 
 import { BucketType, FileCategory } from '@/common/enums'
+import { Maybe } from '@/common/types'
 import { config } from '@/config'
 
 @Injectable()
 export class S3Service {
-  private readonly client = new S3Client({
+  client = new S3Client({
     credentials: {
       accessKeyId: config.aws.accessKeyId,
       secretAccessKey: config.aws.secretAccessKey,
@@ -50,7 +51,7 @@ export class S3Service {
     } as { bucketType: BucketType; key: string; category: FileCategory; url?: string }
   }
 
-  async copyObjectFromTempToAsset(fileKey?: string): Promise<string | undefined> {
+  async copyObjectFromTempToAsset(fileKey: Maybe<string>): Promise<string | undefined> {
     if (!fileKey) return undefined
 
     const { bucketType, key } = this.decodeFileKey(fileKey)

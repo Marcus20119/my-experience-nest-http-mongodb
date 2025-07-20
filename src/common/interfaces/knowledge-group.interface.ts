@@ -1,7 +1,8 @@
-import { ApiProperty } from '@nestjs/swagger'
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 
 import { KnowledgeGroup } from '@/db/entities/knowledge-group.entity'
 
+import { Maybe } from '../types'
 import { DisplayName } from './display-name.interface'
 import { BaseKnowledgeItemResponse } from './knowledge-item.interface'
 
@@ -16,10 +17,11 @@ export class BaseKnowledgeGroupResponse {
   })
   name: DisplayName
 
-  @ApiProperty({
+  @ApiPropertyOptional({
+    nullable: true,
     type: String,
   })
-  description: string
+  description: Maybe<string>
 
   @ApiProperty({
     type: [BaseKnowledgeItemResponse],

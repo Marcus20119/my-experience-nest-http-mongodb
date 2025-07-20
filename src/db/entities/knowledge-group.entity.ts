@@ -2,6 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 
 import { DisplayName } from '@/common/interfaces'
 import { BaseKnowledgeItemResponse } from '@/common/interfaces/knowledge-item.interface'
+import { Maybe } from '@/common/types'
 
 import { BaseEntity } from '../base'
 
@@ -14,11 +15,13 @@ export class KnowledgeGroup extends BaseEntity {
   name: DisplayName
 
   @Prop({
+    required: true,
     type: String,
   })
   slug: string
 
   @Prop({
+    required: true,
     type: String,
   })
   search: string
@@ -26,14 +29,17 @@ export class KnowledgeGroup extends BaseEntity {
   @Prop({
     type: String,
   })
-  description: string
+  description: Maybe<string>
 
   @Prop({
+    required: true,
     type: String,
   })
   technologyId: string
 
   @Prop({
+    default: [],
+    required: true,
     type: [BaseKnowledgeItemResponse],
   })
   knowledgeItems: BaseKnowledgeItemResponse[]

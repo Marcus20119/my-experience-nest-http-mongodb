@@ -1,8 +1,9 @@
-import { ApiProperty } from '@nestjs/swagger'
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 
 import { KnowledgeItem } from '@/db/entities/knowledge-item.entity'
 
 import { IconType } from '../enums'
+import { Maybe } from '../types'
 import { DisplayName } from './display-name.interface'
 
 export class BaseKnowledgeItemResponse {
@@ -23,25 +24,40 @@ export class BaseKnowledgeItemResponse {
   })
   iconType: IconType
 
-  @ApiProperty({
+  @ApiPropertyOptional({
+    nullable: true,
     type: String,
   })
-  iconFileKey: string
+  iconFileKey: Maybe<string>
+
+  @ApiPropertyOptional({
+    nullable: true,
+    type: String,
+  })
+  iconName: Maybe<string>
 
   @ApiProperty({
     type: String,
   })
-  iconName: string
+  color1: string
 
-  @ApiProperty({
+  @ApiPropertyOptional({
+    nullable: true,
     type: String,
   })
-  color: string
+  color2: Maybe<string>
 
-  @ApiProperty({
+  @ApiPropertyOptional({
+    nullable: true,
+    type: String,
+  })
+  color3: Maybe<string>
+
+  @ApiPropertyOptional({
+    nullable: true,
     type: Number,
   })
-  rate: number
+  rate?: number
 
   constructor(knowledgeItem: KnowledgeItem) {
     this.id = knowledgeItem.id
@@ -49,7 +65,9 @@ export class BaseKnowledgeItemResponse {
     this.iconType = knowledgeItem.iconType
     this.iconFileKey = knowledgeItem.iconFileKey
     this.iconName = knowledgeItem.iconName
-    this.color = knowledgeItem.color
+    this.color1 = knowledgeItem.color1
+    this.color2 = knowledgeItem.color2
+    this.color3 = knowledgeItem.color3
     this.rate = knowledgeItem.rate
   }
 }

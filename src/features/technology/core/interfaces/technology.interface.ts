@@ -6,6 +6,7 @@ import {
   BaseKnowledgeItemResponse,
   BaseTechnologyResponse,
 } from '@/common/interfaces'
+import { Maybe } from '@/common/types'
 import { Technology } from '@/db/entities'
 import { CloudfrontService } from '@/services/aws/cloud-front/cloudfront.service'
 
@@ -13,7 +14,6 @@ export class TechnologyResponse extends BaseTechnologyResponse {
   @ApiPropertyOptional({
     enum: TechnologyType,
     enumName: 'TechnologyType',
-    nullable: true,
     type: String,
   })
   type: TechnologyType
@@ -22,16 +22,14 @@ export class TechnologyResponse extends BaseTechnologyResponse {
     nullable: true,
     type: String,
   })
-  technologySectionId?: string
+  technologySectionId: Maybe<string>
 
   @ApiPropertyOptional({
-    nullable: true,
     type: [BaseKnowledgeGroupResponse],
   })
   knowledgeGroups: BaseKnowledgeGroupResponse[]
 
   @ApiPropertyOptional({
-    nullable: true,
     type: [BaseKnowledgeItemResponse],
   })
   knowledgeItems: BaseKnowledgeItemResponse[]

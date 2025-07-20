@@ -7,6 +7,7 @@ import { Connection, Model } from 'mongoose'
 
 import { IsStepInRange } from '@/common/decorators'
 import { IconType, SyncAction, TechnologyType } from '@/common/enums'
+import { Maybe } from '@/common/types'
 import { convertSlug, t } from '@/common/utils'
 import { Technology, TechnologySection } from '@/db/entities'
 import { CloudfrontService } from '@/services/aws/cloud-front/cloudfront.service'
@@ -32,16 +33,18 @@ export class CreateTechnologyInput {
   iconType: IconType
 
   @ApiPropertyOptional({
+    nullable: true,
     type: String,
   })
   @IsOptional()
-  iconFileKey?: string
+  iconFileKey: Maybe<string>
 
   @ApiPropertyOptional({
+    nullable: true,
     type: String,
   })
   @IsOptional()
-  iconName?: string
+  iconName: Maybe<string>
 
   @ApiProperty({
     type: String,
@@ -50,32 +53,34 @@ export class CreateTechnologyInput {
   color1: string
 
   @ApiPropertyOptional({
+    nullable: true,
     type: String,
   })
   @IsOptional()
-  color2?: string
+  color2: Maybe<string>
 
   @ApiPropertyOptional({
+    nullable: true,
     type: String,
   })
   @IsOptional()
-  color3?: string
+  color3: Maybe<string>
 
   @ApiPropertyOptional({
+    nullable: true,
     type: String,
   })
   @IsOptional()
-  description?: string
+  description: Maybe<string>
 
-  @ApiPropertyOptional({
+  @ApiProperty({
     maximum: 5,
     minimum: 0,
     type: Number,
   })
-  @IsOptional()
   @IsNumber()
   @IsStepInRange(0, 5, 0.5)
-  rate?: number
+  rate: number
 
   @ApiProperty({
     enum: TechnologyType,
@@ -123,9 +128,9 @@ export class CreateTechnologyCommandHandler
       color2,
       color3,
       description,
+      iconFileKey,
       iconName,
       iconType,
-      iconFileKey,
       name,
       rate,
       technologySectionId,
@@ -155,9 +160,9 @@ export class CreateTechnologyCommandHandler
         color2,
         color3,
         description,
+        iconFileKey: await this.s3Service.copyObjectFromTempToAsset(iconFileKey),
         iconName,
         iconType,
-        iconFileKey: await this.s3Service.copyObjectFromTempToAsset(iconFileKey),
         name,
         rate,
         search: convertSlug(name),

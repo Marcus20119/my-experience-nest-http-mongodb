@@ -5,7 +5,7 @@ import { Technology } from '@/db/entities/technology.entity'
 import { CloudfrontService } from '@/services/aws/cloud-front/cloudfront.service'
 
 import { IconType, TechnologyType } from '../enums'
-import { RawFilterDto } from '../types'
+import { Maybe, RawFilterDto } from '../types'
 
 export class BaseTechnologyResponse {
   @ApiProperty({
@@ -29,13 +29,13 @@ export class BaseTechnologyResponse {
     nullable: true,
     type: String,
   })
-  iconFileKey?: string
+  iconFileKey: Maybe<string>
 
   @ApiPropertyOptional({
     nullable: true,
     type: String,
   })
-  iconName?: string
+  iconName: Maybe<string>
 
   @ApiProperty({
     type: String,
@@ -46,19 +46,19 @@ export class BaseTechnologyResponse {
     nullable: true,
     type: String,
   })
-  color2?: string
+  color2: Maybe<string>
 
   @ApiPropertyOptional({
     nullable: true,
     type: String,
   })
-  color3?: string
+  color3: Maybe<string>
 
   @ApiPropertyOptional({
     nullable: true,
     type: String,
   })
-  description?: string
+  description: Maybe<string>
 
   @ApiPropertyOptional({
     nullable: true,

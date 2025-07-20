@@ -4,6 +4,7 @@ import { InjectConnection, InjectModel } from '@nestjs/mongoose'
 import { Connection, Model } from 'mongoose'
 
 import { SyncAction } from '@/common/enums'
+import { Maybe } from '@/common/types'
 import { t } from '@/common/utils'
 import { Technology, TechnologySection } from '@/db/entities'
 import { CloudfrontService } from '@/services/aws/cloud-front/cloudfront.service'
@@ -37,7 +38,7 @@ export class DeleteTechnologyCommandHandler
     const session = await this.connection.startSession()
     session.startTransaction()
 
-    let iconFileKey: string | undefined
+    let iconFileKey: Maybe<string>
 
     try {
       const technology = await this.technologyModel.findById(command.id).session(session)

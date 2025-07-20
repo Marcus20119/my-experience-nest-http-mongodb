@@ -21,16 +21,20 @@ export class TechnologySection extends BaseEntity {
   name: DisplayName
 
   @Prop({
+    required: true,
     type: String,
   })
   slug: string
 
   @Prop({
+    required: true,
     type: String,
   })
   search: string
 
   @Prop({
+    default: [],
+    required: true,
     type: [BaseTechnologyResponse],
   })
   technologies: BaseTechnologyResponse[]

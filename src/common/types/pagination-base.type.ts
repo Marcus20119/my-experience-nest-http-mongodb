@@ -11,6 +11,7 @@ import {
 
 import { SortType } from '../enums'
 import { OrderValidator } from '../validators/order.validator'
+import { Maybe } from './base.type'
 import {
   RangeDateQueryDto,
   RangeNumberQueryDto,
@@ -35,8 +36,8 @@ export class IMeta {
   @ApiProperty()
   total: number
 
-  @ApiPropertyOptional({ nullable: true })
-  totalPages?: number
+  @ApiPropertyOptional({ nullable: true, type: Number })
+  totalPages: Maybe<number>
 }
 
 export interface ISortInput {
@@ -77,7 +78,6 @@ export class OrderDto {
   @IsString()
   @ApiPropertyOptional({
     description: 'Format: fieldName:[asc,desc]',
-    nullable: true,
   })
   @Validate(OrderValidator)
   order: string
@@ -119,30 +119,30 @@ export class QueryFilterDto extends QuerySingleDto {
   @IsOptional()
   @ValidateNested()
   @Type(() => SortInputDto)
-  @ApiPropertyOptional({ nullable: true })
+  @ApiPropertyOptional({ type: SortInputDto })
   order?: SortInputDto
 
   @IsOptional()
   @ValidateNested({ each: true })
   @Type(() => RangeNumberQueryDto)
-  @ApiPropertyOptional({ nullable: true, type: [RangeNumberQueryDto] })
+  @ApiPropertyOptional({ type: [RangeNumberQueryDto] })
   rangeNumberFilters?: RangeNumberQueryDto[]
 
   @IsOptional()
   @ValidateNested({ each: true })
   @Type(() => RangeDateQueryDto)
-  @ApiPropertyOptional({ nullable: true, type: [RangeDateQueryDto] })
+  @ApiPropertyOptional({ type: [RangeDateQueryDto] })
   rangeDateFilters?: RangeDateQueryDto[]
 
   @IsOptional()
   @ValidateNested({ each: true })
   @Type(() => RangeStringQueryDto)
-  @ApiPropertyOptional({ nullable: true, type: [RangeStringQueryDto] })
+  @ApiPropertyOptional({ type: [RangeStringQueryDto] })
   rangeStringFilters?: RangeStringQueryDto[]
 
   @IsOptional()
   @ValidateNested({ each: true })
   @Type(() => SearchInputDto)
-  @ApiPropertyOptional({ nullable: true, type: [SearchInputDto] })
+  @ApiPropertyOptional({ type: [SearchInputDto] })
   searches?: SearchInputDto[]
 }

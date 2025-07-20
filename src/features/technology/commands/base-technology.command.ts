@@ -3,6 +3,7 @@ import { ClientSession, Model } from 'mongoose'
 
 import { IconType, SyncAction } from '@/common/enums'
 import { BaseTechnologyResponse } from '@/common/interfaces'
+import { Maybe } from '@/common/types'
 import { t } from '@/common/utils'
 import { Technology, TechnologySection } from '@/db/entities'
 import { CloudfrontService } from '@/services/aws/cloud-front/cloudfront.service'
@@ -47,7 +48,7 @@ export class BaseTechnologyCommand {
     syncAction,
     technology,
   }: {
-    oldTechnologySectionId?: string
+    oldTechnologySectionId?: Maybe<string>
     session?: ClientSession
     syncAction: SyncAction
     technology: Technology

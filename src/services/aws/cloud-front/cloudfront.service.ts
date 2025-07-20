@@ -14,7 +14,7 @@ import { S3Service } from '../s3/s3.service'
 export class CloudfrontService {
   constructor(private readonly s3Service: S3Service) {}
 
-  private readonly client = new CloudFrontClient({
+  client = new CloudFrontClient({
     credentials: {
       accessKeyId: config.aws.accessKeyId,
       secretAccessKey: config.aws.secretAccessKey,

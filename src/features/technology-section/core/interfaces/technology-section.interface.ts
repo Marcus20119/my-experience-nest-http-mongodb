@@ -38,7 +38,6 @@ export class TechnologySectionResponse extends BaseTechnologySectionResponse {
   technologyType: TechnologyType
 
   @ApiPropertyOptional({
-    nullable: true,
     type: [BaseTechnologyResponse],
   })
   technologies: BaseTechnologyResponse[]
