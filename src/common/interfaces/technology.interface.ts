@@ -61,10 +61,9 @@ export class BaseTechnologyResponse {
   description: Maybe<string>
 
   @ApiPropertyOptional({
-    nullable: true,
     type: Number,
   })
-  rate?: number
+  rate: number
 
   @ApiProperty({
     type: String,

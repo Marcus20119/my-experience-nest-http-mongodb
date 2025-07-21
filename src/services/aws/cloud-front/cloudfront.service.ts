@@ -6,6 +6,7 @@ import {
 import { getSignedUrl as getCloudFrontSignedUrl } from '@aws-sdk/cloudfront-signer'
 import { Injectable } from '@nestjs/common'
 
+import { Maybe } from '@/common/types'
 import { config } from '@/config'
 
 import { S3Service } from '../s3/s3.service'
@@ -22,10 +23,10 @@ export class CloudfrontService {
     region: config.aws.region,
   })
 
-  getSignedUrl(fileKey?: string): string | undefined {
+  getSignedUrl(fileKey: Maybe<string>): string | undefined {
     if (!fileKey) return undefined
 
-    const { bucketType, key } = this.s3Service.decodeFileKey(fileKey)
+    const { bucketType, key, name } = this.s3Service.decodeFileKey(fileKey)
 
     if (!bucketType || !key) return undefined
 
@@ -57,7 +58,7 @@ export class CloudfrontService {
       url,
     })
 
-    return `${bucketType}|${key}>${signedUrl}`
+    return `${bucketType}|${key}>${signedUrl}${name ? `>${name}` : ''}`
   }
 
   async invalidateCache(fileKeys: string[]): Promise<void> {

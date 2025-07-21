@@ -6,6 +6,7 @@ import { Model } from 'mongoose'
 import { t } from '@/common/utils'
 import { Technology } from '@/db/entities'
 import { CloudfrontService } from '@/services/aws/cloud-front/cloudfront.service'
+import { S3Service } from '@/services/aws/s3/s3.service'
 
 import { TechnologyResponse } from '../core/interfaces/technology.interface'
 
@@ -17,6 +18,7 @@ export class DetailTechnologyQuery {
 export class DetailTechnologyQueryHandler implements IQueryHandler<DetailTechnologyQuery> {
   constructor(
     protected readonly cloudfrontService: CloudfrontService,
+    protected readonly s3Service: S3Service,
     @InjectModel(Technology.name)
     private readonly technologyModel: Model<Technology>,
   ) {}
@@ -26,6 +28,13 @@ export class DetailTechnologyQueryHandler implements IQueryHandler<DetailTechnol
 
     if (!technology) {
       throw new BadRequestException(t('message.technology.notFound'))
+    }
+
+    const iconFileName = await this.s3Service.getObjectName(technology.iconFileKey)
+    const iconSignedUrl = this.cloudfrontService.getSignedUrl(technology.iconFileKey)
+
+    if (iconFileName) {
+      technology.iconFileKey = `${technology.iconFileKey}>${iconSignedUrl}>${iconFileName}`
     }
 
     return new TechnologyResponse(technology, this.cloudfrontService)

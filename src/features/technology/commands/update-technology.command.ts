@@ -8,6 +8,7 @@ import { SyncAction } from '@/common/enums'
 import { convertSlug, t } from '@/common/utils'
 import { Technology, TechnologySection } from '@/db/entities'
 import { CloudfrontService } from '@/services/aws/cloud-front/cloudfront.service'
+import { S3Service } from '@/services/aws/s3/s3.service'
 
 import { TechnologyResponse } from '../core/interfaces/technology.interface'
 import { BaseTechnologyCommand } from './base-technology.command'
@@ -33,6 +34,7 @@ export class UpdateTechnologyCommandHandler
     @InjectModel(TechnologySection.name)
     protected readonly technologySectionModel: Model<TechnologySection>,
     protected readonly cloudfrontService: CloudfrontService,
+    protected readonly s3Service: S3Service,
     @InjectConnection()
     private readonly connection: Connection,
   ) {
@@ -83,7 +85,7 @@ export class UpdateTechnologyCommandHandler
           color2,
           color3,
           description,
-          iconFileKey,
+          iconFileKey: await this.s3Service.copyObjectFromTempToAsset(iconFileKey),
           iconName,
           iconType,
           name,

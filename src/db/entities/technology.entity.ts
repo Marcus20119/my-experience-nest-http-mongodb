@@ -87,7 +87,7 @@ export class Technology extends BaseEntity {
   @Prop({
     type: String,
   })
-  technologySectionId?: null | string
+  technologySectionId?: string
 
   @Prop({
     default: [],
