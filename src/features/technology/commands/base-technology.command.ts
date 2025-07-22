@@ -8,6 +8,30 @@ import { t } from '@/common/utils'
 import { Technology, TechnologySection } from '@/db/entities'
 import { CloudfrontService } from '@/services/aws/cloud-front/cloudfront.service'
 
+interface SyncUpdateTechnologySectionProps {
+  oldTechnologySectionId?: Maybe<string>
+  session?: ClientSession
+  syncAction: SyncAction.Update
+  technology: Technology
+}
+
+interface SyncCreateTechnologySectionProps {
+  session?: ClientSession
+  syncAction: SyncAction.Create
+  technology: Technology
+}
+
+interface SyncDeleteTechnologySectionProps {
+  session?: ClientSession
+  syncAction: SyncAction.Delete
+  technology: Technology
+}
+
+type SyncTechnologySectionProps =
+  | SyncCreateTechnologySectionProps
+  | SyncDeleteTechnologySectionProps
+  | SyncUpdateTechnologySectionProps
+
 export class BaseTechnologyCommand {
   constructor(
     protected readonly technologySectionModel: Model<TechnologySection>,
@@ -43,16 +67,11 @@ export class BaseTechnologyCommand {
   }
 
   protected async syncTechnologySectionInfo({
-    oldTechnologySectionId,
     session,
     syncAction,
     technology,
-  }: {
-    oldTechnologySectionId?: Maybe<string>
-    session?: ClientSession
-    syncAction: SyncAction
-    technology: Technology
-  }): Promise<void> {
+    ...props
+  }: SyncTechnologySectionProps): Promise<void> {
     switch (syncAction) {
       case SyncAction.Create: {
         if (!technology.technologySectionId) {
@@ -68,7 +87,13 @@ export class BaseTechnologyCommand {
       }
 
       case SyncAction.Update: {
-        if (!technology.technologySectionId || !oldTechnologySectionId) {
+        const { oldTechnologySectionId } = props as SyncUpdateTechnologySectionProps
+
+        if (
+          !technology.technologySectionId ||
+          !oldTechnologySectionId ||
+          technology.technologySectionId === oldTechnologySectionId
+        ) {
           return
         }
 
@@ -117,9 +142,7 @@ export class BaseTechnologyCommand {
     }
 
     section.technologies.push(new BaseTechnologyResponse(technology, this.cloudfrontService))
-    await section.save({
-      session,
-    })
+    await section.save({ session })
   }
 
   private async removeTechnologyInSection({
@@ -137,13 +160,7 @@ export class BaseTechnologyCommand {
       throw new BadRequestException(t('message.technologySection.notFound'))
     }
 
-    const index = section.technologies.findIndex((item) => item.id === technologyId)
-
-    if (index >= 0) {
-      section.technologies.splice(index, 1)
-      await section.save({
-        session,
-      })
-    }
+    section.technologies = section.technologies.filter((t) => t.id !== technologyId)
+    await section.save({ session })
   }
 }

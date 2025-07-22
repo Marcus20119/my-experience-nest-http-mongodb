@@ -52,7 +52,8 @@ export class CreateTechnologySectionCommandHandler
     const slug = convertSlug(name.original)
 
     const existedTechnologySection = await this.technologySectionModel.findOne({
-      $and: [{ $or: [{ 'name.original': name.original }, { slug }] }, { technologyType }],
+      $or: [{ 'name.original': name.original }, { slug }],
+      technologyType,
     })
 
     if (existedTechnologySection) {

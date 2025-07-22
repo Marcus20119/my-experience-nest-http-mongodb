@@ -1,11 +1,10 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
-import { IsEnum, IsMongoId, IsOptional } from 'class-validator'
 
 import { Technology } from '@/db/entities/technology.entity'
 import { CloudfrontService } from '@/services/aws/cloud-front/cloudfront.service'
 
-import { IconType, TechnologyType } from '../enums'
-import { Maybe, RawFilterDto } from '../types'
+import { IconType } from '../enums'
+import { Maybe } from '../types'
 
 export class BaseTechnologyResponse {
   @ApiProperty({
@@ -87,22 +86,4 @@ export class BaseTechnologyResponse {
       this.iconFileKey = cloudfrontService.getSignedUrl(this.iconFileKey)
     }
   }
-}
-
-export class TechnologyQueryFilter implements RawFilterDto {
-  @ApiPropertyOptional({
-    enum: TechnologyType,
-    enumName: 'TechnologyType',
-    type: String,
-  })
-  @IsOptional()
-  @IsEnum(TechnologyType)
-  technologyType?: TechnologyType
-
-  @ApiPropertyOptional({
-    type: String,
-  })
-  @IsOptional()
-  @IsMongoId()
-  technologySectionId?: string
 }

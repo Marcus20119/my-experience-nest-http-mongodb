@@ -1,4 +1,5 @@
 import { ApiPropertyOptional } from '@nestjs/swagger'
+import { IsEnum, IsMongoId, IsOptional } from 'class-validator'
 
 import { TechnologyType } from '@/common/enums'
 import {
@@ -6,6 +7,7 @@ import {
   BaseKnowledgeItemResponse,
   BaseTechnologyResponse,
 } from '@/common/interfaces'
+import { RawFilterDto } from '@/common/types'
 import { Technology } from '@/db/entities'
 import { CloudfrontService } from '@/services/aws/cloud-front/cloudfront.service'
 
@@ -39,4 +41,22 @@ export class TechnologyResponse extends BaseTechnologyResponse {
     this.knowledgeGroups = technology.knowledgeGroups
     this.knowledgeItems = technology.knowledgeItems
   }
+}
+
+export class TechnologyQueryFilter implements RawFilterDto {
+  @ApiPropertyOptional({
+    enum: TechnologyType,
+    enumName: 'TechnologyType',
+    type: String,
+  })
+  @IsOptional()
+  @IsEnum(TechnologyType)
+  technologyType?: TechnologyType
+
+  @ApiPropertyOptional({
+    type: String,
+  })
+  @IsOptional()
+  @IsMongoId()
+  technologySectionId?: string
 }

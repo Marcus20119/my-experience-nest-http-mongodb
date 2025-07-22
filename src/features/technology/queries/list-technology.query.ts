@@ -2,7 +2,6 @@ import { IQueryHandler, QueryHandler } from '@nestjs/cqrs'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 
-import { TechnologyQueryFilter } from '@/common/interfaces'
 import { IPaginatedResponse, OrderDto, PaginationDto } from '@/common/types'
 import DBCommand from '@/common/utils/command'
 import BuildQuery from '@/common/utils/helper'
@@ -10,7 +9,7 @@ import PaginationHelper from '@/common/utils/pagination-helper'
 import { Technology } from '@/db/entities'
 import { CloudfrontService } from '@/services/aws/cloud-front/cloudfront.service'
 
-import { TechnologyResponse } from '../core/interfaces/technology.interface'
+import { TechnologyQueryFilter, TechnologyResponse } from '../core/interfaces/technology.interface'
 
 export class ListTechnologyQueryInput {
   constructor(

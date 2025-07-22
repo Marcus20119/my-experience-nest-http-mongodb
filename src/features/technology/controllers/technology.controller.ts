@@ -13,7 +13,6 @@ import { CommandBus, QueryBus } from '@nestjs/cqrs'
 import { ApiExtraModels, ApiOperation, ApiTags } from '@nestjs/swagger'
 
 import { RequiredId } from '@/common/decorators'
-import { TechnologyQueryFilter } from '@/common/interfaces'
 import { ApiSuccessPaginatedResponse, ApiSuccessResponse } from '@/common/libs/swagger'
 import { OrderDto, PaginationDto } from '@/common/types'
 
@@ -26,8 +25,8 @@ import {
   UpdateTechnologyCommand,
   UpdateTechnologyInput,
 } from '../commands/update-technology.command'
-import { TechnologyResponse } from '../core/interfaces/technology.interface'
-import { DetailTechnologyQuery } from '../queries/detail-technology.query'
+import { TechnologyQueryFilter, TechnologyResponse } from '../core/interfaces/technology.interface'
+import { DetailTechnologyQueryInput } from '../queries/detail-technology.query'
 import { ListTechnologyQueryInput } from '../queries/list-technology.query'
 
 @ApiTags('Technology')
@@ -63,7 +62,7 @@ export class TechnologyController {
   @ApiOperation({ summary: 'Get detail technology' })
   @ApiSuccessResponse({ type: TechnologyResponse })
   async getDetailTechnology(@RequiredId('id') id: string) {
-    return await this.queryBus.execute(new DetailTechnologyQuery(id))
+    return await this.queryBus.execute(new DetailTechnologyQueryInput(id))
   }
 
   @Get()

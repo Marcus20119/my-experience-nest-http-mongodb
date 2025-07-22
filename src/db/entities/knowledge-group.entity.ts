@@ -18,12 +18,6 @@ export class KnowledgeGroup extends BaseEntity {
     required: true,
     type: String,
   })
-  slug: string
-
-  @Prop({
-    required: true,
-    type: String,
-  })
   search: string
 
   @Prop({
@@ -36,6 +30,11 @@ export class KnowledgeGroup extends BaseEntity {
     type: String,
   })
   technologyId: string
+
+  @Prop({
+    type: String,
+  })
+  technologySectionId?: string
 
   @Prop({
     default: [],

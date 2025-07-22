@@ -10,12 +10,12 @@ import { S3Service } from '@/services/aws/s3/s3.service'
 
 import { TechnologyResponse } from '../core/interfaces/technology.interface'
 
-export class DetailTechnologyQuery {
+export class DetailTechnologyQueryInput {
   constructor(public readonly id: string) {}
 }
 
-@QueryHandler(DetailTechnologyQuery)
-export class DetailTechnologyQueryHandler implements IQueryHandler<DetailTechnologyQuery> {
+@QueryHandler(DetailTechnologyQueryInput)
+export class DetailTechnologyQueryHandler implements IQueryHandler<DetailTechnologyQueryInput> {
   constructor(
     protected readonly cloudfrontService: CloudfrontService,
     protected readonly s3Service: S3Service,
@@ -23,7 +23,7 @@ export class DetailTechnologyQueryHandler implements IQueryHandler<DetailTechnol
     private readonly technologyModel: Model<Technology>,
   ) {}
 
-  async execute(query: DetailTechnologyQuery): Promise<TechnologyResponse> {
+  async execute(query: DetailTechnologyQueryInput): Promise<TechnologyResponse> {
     const technology = await this.technologyModel.findById(query.id)
 
     if (!technology) {
@@ -34,7 +34,7 @@ export class DetailTechnologyQueryHandler implements IQueryHandler<DetailTechnol
     const iconSignedUrl = this.cloudfrontService.getSignedUrl(technology.iconFileKey)
 
     if (iconFileName) {
-      technology.iconFileKey = `${technology.iconFileKey}>${iconSignedUrl}>${iconFileName}`
+      technology.iconFileKey = `${iconSignedUrl}>${iconFileName}`
     }
 
     return new TechnologyResponse(technology, this.cloudfrontService)

@@ -3,6 +3,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 
 import { API_VERSION, APP_ENV } from '@/common/constants'
 import { config } from '@/config'
+import { KnowledgeGroupModule } from '@/features/knowledge-group/knowledge-group.module'
 import { TechnologyModule } from '@/features/technology/technology.module'
 import { TechnologySectionModule } from '@/features/technology-section/technology-section.module'
 import { S3Module } from '@/services/aws/s3/s3.module'
@@ -23,7 +24,7 @@ export function swaggerSetup(app: INestApplication) {
 
   const technologyDocument = SwaggerModule.createDocument(app, commonConfig, {
     ignoreGlobalPrefix: true,
-    include: [TechnologySectionModule, TechnologyModule],
+    include: [TechnologySectionModule, TechnologyModule, KnowledgeGroupModule],
   })
 
   const storageDocument = SwaggerModule.createDocument(app, commonConfig, {
