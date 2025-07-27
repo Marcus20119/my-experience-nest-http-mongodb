@@ -10,7 +10,7 @@ import { SyncAction } from '@/common/enums'
 import { DisplayName } from '@/common/interfaces'
 import { Maybe } from '@/common/types'
 import { convertSlug, joinDisplayName, t } from '@/common/utils'
-import { KnowledgeGroup, Technology } from '@/db/entities'
+import { KnowledgeGroup, KnowledgeItem, Technology } from '@/db/entities'
 
 import { KnowledgeGroupResponse } from '../core/interfaces/knowledge-group.interface'
 import { BaseKnowledgeGroupCommand } from './base-knowledge-group.command'
@@ -53,10 +53,12 @@ export class CreateKnowledgeGroupCommandHandler
     protected readonly knowledgeGroupModel: Model<KnowledgeGroup>,
     @InjectModel(Technology.name)
     protected readonly technologyModel: Model<Technology>,
+    @InjectModel(KnowledgeItem.name)
+    protected readonly knowledgeItemModel: Model<KnowledgeItem>,
     @InjectConnection()
     private readonly connection: Connection,
   ) {
-    super(technologyModel)
+    super(technologyModel, knowledgeItemModel)
   }
 
   async execute(command: CreateKnowledgeGroupCommand): Promise<KnowledgeGroupResponse> {
@@ -67,9 +69,12 @@ export class CreateKnowledgeGroupCommandHandler
     session.startTransaction()
 
     try {
+      const slug = convertSlug(name.original)
+
+      // Step 1: Check uniqueness
       const existedKnowledgeGroup = await this.knowledgeGroupModel
         .findOne({
-          'name.original': name.original,
+          $or: [{ 'name.original': name.original }, { slug }],
           technologyId,
         })
         .session(session)
@@ -78,29 +83,34 @@ export class CreateKnowledgeGroupCommandHandler
         throw new BadRequestException(t('message.knowledgeGroup.existed'))
       }
 
+      // Step 2: Check if the section exists
       const technology = await this.technologyModel.findById(technologyId).session(session)
 
       if (!technology) {
         throw new BadRequestException(t('message.technology.notFound'))
       }
 
-      const newKnowledgeGroup = new this.knowledgeGroupModel({
+      // Step 3: Create knowledge group
+      const knowledgeGroup = new this.knowledgeGroupModel({
         description,
         name,
         search: convertSlug(joinDisplayName(name)),
         technologyId: technology._id,
         technologySectionId: technology.technologySectionId,
+        technologyType: technology.technologyType,
       })
 
-      await newKnowledgeGroup.save({ session })
-      await this.syncKnowledgeGroupInfo({
-        knowledgeGroup: newKnowledgeGroup,
+      await knowledgeGroup.save({ session })
+
+      // Step 4: Sync data to related documents
+      await this.syncData({
+        knowledgeGroup,
         session,
         syncAction: SyncAction.Create,
       })
 
       await session.commitTransaction()
-      return new KnowledgeGroupResponse(newKnowledgeGroup)
+      return new KnowledgeGroupResponse(knowledgeGroup)
     } catch (error) {
       await session.abortTransaction()
       throw error

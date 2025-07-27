@@ -6,40 +6,46 @@ import { IPaginatedResponse, OrderDto, PaginationDto } from '@/common/types'
 import DBCommand from '@/common/utils/command'
 import BuildQuery from '@/common/utils/helper'
 import PaginationHelper from '@/common/utils/pagination-helper'
-import { Technology } from '@/db/entities'
+import { KnowledgeItem } from '@/db/entities'
 import { CloudfrontService } from '@/services/aws/cloud-front/cloudfront.service'
 
-import { TechnologyQueryFilter, TechnologyResponse } from '../core/interfaces/technology.interface'
+import {
+  KnowledgeItemQueryFilter,
+  KnowledgeItemResponse,
+} from '../core/interfaces/knowledge-item.interface'
 
-export class ListTechnologyQueryInput {
+export class ListKnowledgeItemQueryInput {
   constructor(
     public params: {
-      filter: TechnologyQueryFilter
+      filter: KnowledgeItemQueryFilter
       orderBy: OrderDto
       pagination: PaginationDto
     },
   ) {}
 }
 
-@QueryHandler(ListTechnologyQueryInput)
-export class ListTechnologyQueryHandler implements IQueryHandler<ListTechnologyQueryInput> {
+@QueryHandler(ListKnowledgeItemQueryInput)
+export class ListKnowledgeItemQueryHandler implements IQueryHandler<ListKnowledgeItemQueryInput> {
   constructor(
     protected readonly cloudfrontService: CloudfrontService,
-    @InjectModel(Technology.name)
-    private readonly technologyModel: Model<Technology>,
+    @InjectModel(KnowledgeItem.name)
+    private readonly knowledgeItemModel: Model<KnowledgeItem>,
   ) {}
 
   async execute(
-    command: ListTechnologyQueryInput,
-  ): Promise<IPaginatedResponse<TechnologyResponse>> {
+    command: ListKnowledgeItemQueryInput,
+  ): Promise<IPaginatedResponse<KnowledgeItemResponse>> {
     const payload = await this.handleFilter(command)
 
     const { limit, offset } = payload
 
-    const { items, total } = await DBCommand.runGetMany<Technology>(this.technologyModel, payload)
+    const { items, total } = await DBCommand.runGetMany<KnowledgeItem>(
+      this.knowledgeItemModel,
+      payload,
+    )
 
     const results = await Promise.all(
-      items.map(async (i) => new TechnologyResponse(i, this.cloudfrontService)),
+      items.map(async (i) => new KnowledgeItemResponse(i, this.cloudfrontService)),
     )
 
     return PaginationHelper.pagination({
@@ -50,7 +56,7 @@ export class ListTechnologyQueryHandler implements IQueryHandler<ListTechnologyQ
     })
   }
 
-  private async handleFilter(command: ListTechnologyQueryInput) {
+  private async handleFilter(command: ListKnowledgeItemQueryInput) {
     const { filter, orderBy, pagination } = command.params
 
     const payload = BuildQuery.getManyRequest({
@@ -59,15 +65,9 @@ export class ListTechnologyQueryHandler implements IQueryHandler<ListTechnologyQ
       pagination,
     })
 
-    if (filter.technologyType) {
-      payload.filters.technologyType = {
-        $eq: filter.technologyType,
-      }
-    }
-
-    if (filter.technologySectionId) {
-      payload.filters.technologySectionId = {
-        $eq: filter.technologySectionId,
+    if (filter.knowledgeGroupId) {
+      payload.filters.knowledgeGroupId = {
+        $eq: filter.knowledgeGroupId,
       }
     }
 

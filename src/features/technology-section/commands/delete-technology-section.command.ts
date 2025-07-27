@@ -3,9 +3,12 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { InjectConnection, InjectModel } from '@nestjs/mongoose'
 import { Connection, Model } from 'mongoose'
 
+import { SyncAction } from '@/common/enums'
 import { t } from '@/common/utils'
-import { Technology, TechnologySection } from '@/db/entities'
+import { KnowledgeGroup, KnowledgeItem, Technology, TechnologySection } from '@/db/entities'
 import { S3Service } from '@/services/aws/s3/s3.service'
+
+import { BaseTechnologySectionCommand } from './base-technology-section.command'
 
 export class DeleteTechnologySectionCommand {
   constructor(public readonly id: string) {}
@@ -13,43 +16,79 @@ export class DeleteTechnologySectionCommand {
 
 @CommandHandler(DeleteTechnologySectionCommand)
 export class DeleteTechnologySectionCommandHandler
+  extends BaseTechnologySectionCommand
   implements ICommandHandler<DeleteTechnologySectionCommand>
 {
   constructor(
     @InjectModel(TechnologySection.name)
-    private readonly technologySectionModel: Model<TechnologySection>,
+    protected readonly technologySectionModel: Model<TechnologySection>,
     @InjectModel(Technology.name)
-    private readonly technologyModel: Model<Technology>,
+    protected readonly technologyModel: Model<Technology>,
+    @InjectModel(KnowledgeGroup.name)
+    protected readonly knowledgeGroupModel: Model<KnowledgeGroup>,
+    @InjectModel(KnowledgeItem.name)
+    protected readonly knowledgeItemModel: Model<KnowledgeItem>,
     protected readonly s3Service: S3Service,
     @InjectConnection()
     private readonly connection: Connection,
-  ) {}
+  ) {
+    super(technologyModel, knowledgeGroupModel, knowledgeItemModel)
+  }
 
   async execute(command: DeleteTechnologySectionCommand): Promise<void> {
     const session = await this.connection.startSession()
     session.startTransaction()
 
-    let iconFileKeys: string[] = []
-
     try {
+      // Step 1: Check if the section exists
       const technologySection = await this.technologySectionModel.findById(command.id)
 
       if (!technologySection) {
         throw new BadRequestException(t('message.technologySection.notFound'))
       }
-      // Step 1: Fetch associated technologies
+
+      // Step 2: Fetch associated technologies and knowledgeItems
       const technologies = await this.technologyModel
         .find({ technologySectionId: command.id })
         .session(session)
+      const knowledgeItems = await this.knowledgeItemModel
+        .find({ technologySectionId: command.id })
+        .session(session)
 
-      // Step 2: Extract iconFileKeys (file keys) from associated technologies
-      iconFileKeys = technologies.map((t) => t.iconFileKey).filter((url): url is string => !!url)
+      // Step 3: Extract removedIconFileKeys from associated technologies and knowledgeItems
+      let removedIconFileKeys: string[] = []
 
-      // Step 3: Delete technologies
-      await this.technologyModel.deleteMany({ technologySectionId: command.id }).session(session)
+      const technologyIconFileKeys = technologies
+        .map((t) => t.iconFileKey)
+        .filter((url): url is string => !!url)
+      const knowledgeItemIconFileKeys = knowledgeItems
+        .map((k) => k.iconFileKey)
+        .filter((url): url is string => !!url)
+      const knowledgeItemImageFileKeys = knowledgeItems
+        .flatMap((k) => k.imageFileKeys)
+        .filter((url): url is string => !!url)
 
-      // Step 4: Delete the section itself
+      removedIconFileKeys = [
+        ...removedIconFileKeys,
+        ...technologyIconFileKeys,
+        ...knowledgeItemIconFileKeys,
+        ...knowledgeItemImageFileKeys,
+      ]
+
+      // Step 4: Delete related documents
+      await this.syncData({
+        session,
+        syncAction: SyncAction.Delete,
+        technologySection,
+      })
+
+      // Step 5: Delete the section itself
       await this.technologySectionModel.findByIdAndDelete(command.id).session(session)
+
+      // 🧹 Step 6: Cleanup S3 for deleted documents
+      if (removedIconFileKeys.length > 0) {
+        await this.s3Service.deleteFiles(removedIconFileKeys)
+      }
 
       await session.commitTransaction()
     } catch (error) {
@@ -57,11 +96,6 @@ export class DeleteTechnologySectionCommandHandler
       throw error
     } finally {
       session.endSession()
-    }
-
-    // 🧹 Step 5: Cleanup S3 + CloudFront outside transaction
-    if (iconFileKeys.length > 0) {
-      await this.s3Service.deleteFiles(iconFileKeys)
     }
   }
 }

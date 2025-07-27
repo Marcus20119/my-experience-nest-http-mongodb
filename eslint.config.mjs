@@ -101,6 +101,14 @@ export default [
           type: 'alphabetical',
         },
       ],
+      'perfectionist/sort-object-types': [
+        'error',
+        {
+          ignoreCase: true,
+          order: 'asc',
+          type: 'alphabetical',
+        },
+      ],
       'perfectionist/sort-exports': [
         'error',
         {

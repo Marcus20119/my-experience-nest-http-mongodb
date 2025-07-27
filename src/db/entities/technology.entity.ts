@@ -87,7 +87,7 @@ export class Technology extends BaseEntity {
   @Prop({
     type: String,
   })
-  technologySectionId?: string
+  technologySectionId: Maybe<string>
 
   @Prop({
     default: [],

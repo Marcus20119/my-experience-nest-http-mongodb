@@ -4,6 +4,7 @@ import { ScheduleModule } from '@nestjs/schedule'
 
 import { RequestContextModule } from './common/request-context'
 import { KnowledgeGroupModule } from './features/knowledge-group/knowledge-group.module'
+import { KnowledgeItemModule } from './features/knowledge-item/knowledge-item.module'
 import { TechnologyModule } from './features/technology/technology.module'
 import { TechnologySectionModule } from './features/technology-section/technology-section.module'
 import { DatabaseModule } from './modules/database.module'
@@ -26,6 +27,7 @@ import { S3Module } from './services/aws/s3/s3.module'
     TechnologySectionModule,
     TechnologyModule,
     KnowledgeGroupModule,
+    KnowledgeItemModule,
   ],
 })
 export class AppModule {}

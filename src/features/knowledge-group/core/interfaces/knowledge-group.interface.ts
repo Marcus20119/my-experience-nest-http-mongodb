@@ -1,6 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import { IsMongoId, IsOptional } from 'class-validator'
 
+import { TechnologyType } from '@/common/enums'
 import { BaseKnowledgeGroupResponse } from '@/common/interfaces'
 import { RawFilterDto } from '@/common/types'
 import { KnowledgeGroup } from '@/db/entities'
@@ -12,20 +13,27 @@ export class KnowledgeGroupResponse extends BaseKnowledgeGroupResponse {
   search: string
 
   @ApiProperty({
+    enum: TechnologyType,
+    enumName: 'TechnologyType',
     type: String,
   })
-  technologyId: string
+  technologyType: TechnologyType
 
   @ApiPropertyOptional({
-    nullable: true,
     type: String,
   })
   technologySectionId?: string
+
+  @ApiProperty({
+    type: String,
+  })
+  technologyId: string
 
   constructor(knowledgeGroup: KnowledgeGroup) {
     super(knowledgeGroup)
     this.search = knowledgeGroup.search
     this.technologyId = knowledgeGroup.technologyId
+    this.technologyType = knowledgeGroup.technologyType
   }
 }
 

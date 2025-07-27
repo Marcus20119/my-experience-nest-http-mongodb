@@ -29,6 +29,8 @@ export type I18nTranslations = {
         "knowledgeItem": {
             "existed": string;
             "notFound": string;
+            "shouldContainIconName": string;
+            "shouldContainIconUrl": string;
         };
         "technology": {
             "existed": string;

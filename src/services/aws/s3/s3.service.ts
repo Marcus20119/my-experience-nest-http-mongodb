@@ -39,8 +39,8 @@ export class S3Service {
     fileKey: string,
   ): {
     bucketType?: BucketType
-    key?: string
     category?: FileCategory
+    key?: string
     name?: string
     url?: string
   } => {
@@ -65,8 +65,8 @@ export class S3Service {
       url,
     } as {
       bucketType: BucketType
-      key: string
       category: FileCategory
+      key: string
       name?: string
       url?: string
     }
@@ -79,7 +79,7 @@ export class S3Service {
 
     if (!bucketType || !key) return undefined
 
-    if (!key.startsWith('temp/')) {
+    if (key.startsWith('asset/')) {
       return this.getFileKey(bucketType, key)
     }
 

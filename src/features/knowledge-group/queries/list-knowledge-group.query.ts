@@ -17,8 +17,8 @@ export class ListKnowledgeGroupInput {
   constructor(
     public params: {
       filter: KnowledgeGroupQueryFilter
-      pagination: PaginationDto
       orderBy: OrderDto
+      pagination: PaginationDto
     },
   ) {}
 }

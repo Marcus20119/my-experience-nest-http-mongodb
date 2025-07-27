@@ -1,10 +1,10 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 
 import { KnowledgeItem } from '@/db/entities/knowledge-item.entity'
+import { CloudfrontService } from '@/services/aws/cloud-front/cloudfront.service'
 
 import { IconType } from '../enums'
 import { Maybe } from '../types'
-import { DisplayName } from './display-name.interface'
 
 export class BaseKnowledgeItemResponse {
   @ApiProperty({
@@ -13,9 +13,9 @@ export class BaseKnowledgeItemResponse {
   id: string
 
   @ApiProperty({
-    type: DisplayName,
+    type: String,
   })
-  name: DisplayName
+  name: string
 
   @ApiProperty({
     enum: IconType,
@@ -59,7 +59,7 @@ export class BaseKnowledgeItemResponse {
   })
   rate?: number
 
-  constructor(knowledgeItem: KnowledgeItem) {
+  constructor(knowledgeItem: KnowledgeItem, cloudfrontService: CloudfrontService) {
     this.id = knowledgeItem.id
     this.name = knowledgeItem.name
     this.iconType = knowledgeItem.iconType
@@ -69,5 +69,9 @@ export class BaseKnowledgeItemResponse {
     this.color2 = knowledgeItem.color2
     this.color3 = knowledgeItem.color3
     this.rate = knowledgeItem.rate
+
+    if (this.iconFileKey) {
+      this.iconFileKey = cloudfrontService.getSignedUrl(this.iconFileKey)
+    }
   }
 }

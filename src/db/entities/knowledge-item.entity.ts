@@ -1,7 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 
-import { IconType } from '@/common/enums'
-import { DisplayName } from '@/common/interfaces'
+import { IconType, TechnologyType } from '@/common/enums'
 import { Maybe } from '@/common/types'
 
 import { BaseEntity } from '../base'
@@ -10,9 +9,9 @@ import { BaseEntity } from '../base'
 export class KnowledgeItem extends BaseEntity {
   @Prop({
     required: true,
-    type: DisplayName,
+    type: String,
   })
-  name: DisplayName
+  name: string
 
   @Prop({
     enum: IconType,
@@ -67,7 +66,7 @@ export class KnowledgeItem extends BaseEntity {
   @Prop({
     type: [String],
   })
-  imageUrls: Maybe<string[]>
+  imageFileKeys: Maybe<string[]>
 
   @Prop({
     required: true,
@@ -82,16 +81,28 @@ export class KnowledgeItem extends BaseEntity {
   search: string
 
   @Prop({
+    enum: TechnologyType,
     required: true,
     type: String,
   })
-  knowledgeGroupId: string
+  technologyType: TechnologyType
+
+  @Prop({
+    type: String,
+  })
+  technologySectionId: Maybe<string>
 
   @Prop({
     required: true,
     type: String,
   })
   technologyId: string
+
+  @Prop({
+    required: true,
+    type: String,
+  })
+  knowledgeGroupId: string
 }
 
 export const KnowledgeItemSchema = SchemaFactory.createForClass(KnowledgeItem)

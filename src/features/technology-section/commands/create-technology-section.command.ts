@@ -1,10 +1,10 @@
 import { BadRequestException } from '@nestjs/common'
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
-import { InjectModel } from '@nestjs/mongoose'
+import { InjectConnection, InjectModel } from '@nestjs/mongoose'
 import { ApiProperty } from '@nestjs/swagger'
 import { Type } from 'class-transformer'
 import { IsEnum, IsNotEmpty, ValidateNested } from 'class-validator'
-import { Model } from 'mongoose'
+import { Connection, Model } from 'mongoose'
 
 import { TechnologyType } from '@/common/enums'
 import { DisplayName } from '@/common/interfaces'
@@ -43,32 +43,49 @@ export class CreateTechnologySectionCommandHandler
   constructor(
     @InjectModel(TechnologySection.name)
     readonly technologySectionModel: Model<TechnologySection>,
+    @InjectConnection()
+    private readonly connection: Connection,
   ) {}
 
   async execute(command: CreateTechnologySectionCommand): Promise<TechnologySectionResponse> {
     const { input } = command
     const { name, technologyType } = input
 
-    const slug = convertSlug(name.original)
+    const session = await this.connection.startSession()
+    session.startTransaction()
 
-    const existedTechnologySection = await this.technologySectionModel.findOne({
-      $or: [{ 'name.original': name.original }, { slug }],
-      technologyType,
-    })
+    try {
+      const slug = convertSlug(name.original)
 
-    if (existedTechnologySection) {
-      throw new BadRequestException(t('message.technologySection.existed'))
+      // Step 1: Check uniqueness
+      const existedTechnologySection = await this.technologySectionModel
+        .findOne({
+          $or: [{ 'name.original': name.original }, { slug }],
+          technologyType,
+        })
+        .session(session)
+
+      if (existedTechnologySection) {
+        throw new BadRequestException(t('message.technologySection.existed'))
+      }
+
+      // Step 2: Create technology section
+      const technologySection = new this.technologySectionModel({
+        name,
+        search: convertSlug(joinDisplayName(name)),
+        slug,
+        technologyType,
+      })
+
+      await technologySection.save({ session })
+
+      await session.commitTransaction()
+      return new TechnologySectionResponse(technologySection)
+    } catch (error) {
+      await session.abortTransaction()
+      throw error
+    } finally {
+      session.endSession()
     }
-
-    const newTechnologySection = await this.technologySectionModel.create({
-      name,
-      search: convertSlug(joinDisplayName(name)),
-      slug,
-      technologyType,
-    })
-
-    await newTechnologySection.save()
-
-    return new TechnologySectionResponse(newTechnologySection)
   }
 }

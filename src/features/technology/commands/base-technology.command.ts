@@ -3,38 +3,36 @@ import { ClientSession, Model } from 'mongoose'
 
 import { IconType, SyncAction } from '@/common/enums'
 import { BaseTechnologyResponse } from '@/common/interfaces'
-import { Maybe } from '@/common/types'
 import { t } from '@/common/utils'
-import { Technology, TechnologySection } from '@/db/entities'
+import { KnowledgeGroup, KnowledgeItem, Technology, TechnologySection } from '@/db/entities'
 import { CloudfrontService } from '@/services/aws/cloud-front/cloudfront.service'
 
-interface SyncUpdateTechnologySectionProps {
-  oldTechnologySectionId?: Maybe<string>
+interface SyncUpdateProps {
+  newTechnology: Technology
+  oldTechnology: Technology
   session?: ClientSession
   syncAction: SyncAction.Update
-  technology: Technology
 }
 
-interface SyncCreateTechnologySectionProps {
+interface SyncCreateProps {
   session?: ClientSession
   syncAction: SyncAction.Create
   technology: Technology
 }
 
-interface SyncDeleteTechnologySectionProps {
+interface SyncDeleteProps {
   session?: ClientSession
   syncAction: SyncAction.Delete
   technology: Technology
 }
 
-type SyncTechnologySectionProps =
-  | SyncCreateTechnologySectionProps
-  | SyncDeleteTechnologySectionProps
-  | SyncUpdateTechnologySectionProps
+type SyncDataProps = SyncCreateProps | SyncDeleteProps | SyncUpdateProps
 
 export class BaseTechnologyCommand {
   constructor(
     protected readonly technologySectionModel: Model<TechnologySection>,
+    protected readonly knowledgeGroupModel: Model<KnowledgeGroup>,
+    protected readonly knowledgeItemModel: Model<KnowledgeItem>,
     protected readonly cloudfrontService: CloudfrontService,
   ) {}
 
@@ -66,17 +64,10 @@ export class BaseTechnologyCommand {
     }
   }
 
-  protected async syncTechnologySectionInfo({
-    session,
-    syncAction,
-    technology,
-    ...props
-  }: SyncTechnologySectionProps): Promise<void> {
+  protected async syncData({ session, syncAction, ...props }: SyncDataProps): Promise<void> {
     switch (syncAction) {
       case SyncAction.Create: {
-        if (!technology.technologySectionId) {
-          return
-        }
+        const { technology } = props as SyncCreateProps
 
         await this.addTechnologyToSection({
           session,
@@ -87,43 +78,87 @@ export class BaseTechnologyCommand {
       }
 
       case SyncAction.Update: {
-        const { oldTechnologySectionId } = props as SyncUpdateTechnologySectionProps
+        const { newTechnology, oldTechnology } = props as SyncUpdateProps
 
-        if (
-          !technology.technologySectionId ||
-          !oldTechnologySectionId ||
-          technology.technologySectionId === oldTechnologySectionId
-        ) {
-          return
-        }
-
-        await this.removeTechnologyInSection({
-          session,
-          technologyId: technology.id,
-          technologySectionId: oldTechnologySectionId,
-        })
-
-        await this.addTechnologyToSection({
-          session,
-          technology,
-          technologySectionId: technology.technologySectionId,
-        })
+        await this.updateRelatedDocuments({ newTechnology, oldTechnology, session })
         break
       }
 
       case SyncAction.Delete: {
-        if (!technology.technologySectionId) {
-          return
-        }
+        const { technology } = props as SyncDeleteProps
 
-        await this.removeTechnologyInSection({
-          session,
-          technologyId: technology.id,
-          technologySectionId: technology.technologySectionId,
-        })
+        await this.deleteRelatedDocuments({ session, technology })
         break
       }
     }
+  }
+
+  private async updateRelatedDocuments({
+    newTechnology,
+    oldTechnology,
+    session = null,
+  }: {
+    newTechnology: Technology
+    oldTechnology: Technology
+    session?: ClientSession | null
+  }) {
+    if (newTechnology.technologySectionId !== oldTechnology.technologySectionId) {
+      await this.removeTechnologyInSection({
+        session,
+        technologyId: oldTechnology.id,
+        technologySectionId: oldTechnology.technologySectionId,
+      })
+
+      await this.addTechnologyToSection({
+        session,
+        technology: newTechnology,
+        technologySectionId: newTechnology.technologySectionId,
+      })
+    }
+
+    await this.knowledgeGroupModel
+      .updateMany(
+        {
+          technologyId: oldTechnology.id,
+        },
+        {
+          $set: {
+            technologySectionId: newTechnology.technologySectionId,
+            technologyType: newTechnology.technologyType,
+          },
+        },
+      )
+      .session(session)
+
+    await this.knowledgeItemModel
+      .updateMany(
+        {
+          technologyId: oldTechnology.id,
+        },
+        {
+          $set: {
+            technologySectionId: newTechnology.technologySectionId,
+            technologyType: newTechnology.technologyType,
+          },
+        },
+      )
+      .session(session)
+  }
+
+  private async deleteRelatedDocuments({
+    session = null,
+    technology,
+  }: {
+    session?: ClientSession | null
+    technology: Technology
+  }) {
+    await this.removeTechnologyInSection({
+      session,
+      technologyId: technology.id,
+      technologySectionId: technology.technologySectionId,
+    })
+    await this.knowledgeGroupModel.deleteMany({ technologyId: technology.id }).session(session)
+    await this.knowledgeItemModel.deleteMany({ technologyId: technology.id }).session(session)
   }
 
   private async addTechnologyToSection({
@@ -133,8 +168,10 @@ export class BaseTechnologyCommand {
   }: {
     session?: ClientSession | null
     technology: Technology
-    technologySectionId: string
+    technologySectionId?: null | string
   }) {
+    if (!technologySectionId || !technology) return
+
     const section = await this.technologySectionModel.findById(technologySectionId).session(session)
 
     if (!section) {
@@ -151,9 +188,11 @@ export class BaseTechnologyCommand {
     technologySectionId,
   }: {
     session?: ClientSession | null
-    technologyId: string
-    technologySectionId: string
+    technologyId?: null | string
+    technologySectionId?: null | string
   }) {
+    if (!technologySectionId || !technologyId) return
+
     const section = await this.technologySectionModel.findById(technologySectionId).session(session)
 
     if (!section) {

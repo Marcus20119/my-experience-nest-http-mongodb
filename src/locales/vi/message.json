@@ -21,7 +21,9 @@
   },
   "knowledgeItem": {
     "existed": "Knowledge item existed",
-    "notFound": "Knowledge item not found"
+    "notFound": "Knowledge item not found",
+    "shouldContainIconName": "Should contain icon name",
+    "shouldContainIconUrl": "Should contain icon url"
   },
   "technology": {
     "existed": "Technology existed",

@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 
+import { TechnologyType } from '@/common/enums'
 import { DisplayName } from '@/common/interfaces'
 import { BaseKnowledgeItemResponse } from '@/common/interfaces/knowledge-item.interface'
 import { Maybe } from '@/common/types'
@@ -26,15 +27,22 @@ export class KnowledgeGroup extends BaseEntity {
   description: Maybe<string>
 
   @Prop({
+    enum: TechnologyType,
     required: true,
     type: String,
   })
-  technologyId: string
+  technologyType: TechnologyType
 
   @Prop({
     type: String,
   })
-  technologySectionId?: string
+  technologySectionId: Maybe<string>
+
+  @Prop({
+    required: true,
+    type: String,
+  })
+  technologyId: string
 
   @Prop({
     default: [],

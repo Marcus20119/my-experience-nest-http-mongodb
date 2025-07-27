@@ -4,46 +4,39 @@ import { ClientSession, Model } from 'mongoose'
 import { SyncAction } from '@/common/enums'
 import { BaseKnowledgeGroupResponse } from '@/common/interfaces'
 import { t } from '@/common/utils'
-import { KnowledgeGroup, Technology } from '@/db/entities'
+import { KnowledgeGroup, KnowledgeItem, Technology } from '@/db/entities'
 
-interface SyncUpdateKnowledgeGroupProps {
-  knowledgeGroup: KnowledgeGroup
-  oldKnowledgeGroupId?: string
+interface SyncUpdateProps {
+  newKnowledgeGroup: KnowledgeGroup
+  oldKnowledgeGroup: KnowledgeGroup
   session?: ClientSession
   syncAction: SyncAction.Update
 }
 
-interface SyncCreateKnowledgeGroupProps {
+interface SyncCreateProps {
   knowledgeGroup: KnowledgeGroup
   session?: ClientSession
   syncAction: SyncAction.Create
 }
 
-interface SyncDeleteKnowledgeGroupProps {
+interface SyncDeleteProps {
   knowledgeGroup: KnowledgeGroup
   session?: ClientSession
   syncAction: SyncAction.Delete
 }
 
-type SyncKnowledgeGroupProps =
-  | SyncCreateKnowledgeGroupProps
-  | SyncDeleteKnowledgeGroupProps
-  | SyncUpdateKnowledgeGroupProps
+type SyncDataProps = SyncCreateProps | SyncDeleteProps | SyncUpdateProps
 
 export class BaseKnowledgeGroupCommand {
-  constructor(protected readonly technologyModel: Model<Technology>) {}
+  constructor(
+    protected readonly technologyModel: Model<Technology>,
+    protected readonly knowledgeItemModel: Model<KnowledgeItem>,
+  ) {}
 
-  protected async syncKnowledgeGroupInfo({
-    knowledgeGroup,
-    session,
-    syncAction,
-    ...props
-  }: SyncKnowledgeGroupProps): Promise<void> {
+  protected async syncData({ session, syncAction, ...props }: SyncDataProps): Promise<void> {
     switch (syncAction) {
       case SyncAction.Create: {
-        if (!knowledgeGroup.technologyId) {
-          return
-        }
+        const { knowledgeGroup } = props as SyncCreateProps
 
         await this.addKnowledgeGroupToTechnology({
           knowledgeGroup,
@@ -54,42 +47,75 @@ export class BaseKnowledgeGroupCommand {
       }
 
       case SyncAction.Update: {
-        const { oldKnowledgeGroupId } = props as SyncUpdateKnowledgeGroupProps
+        const { newKnowledgeGroup, oldKnowledgeGroup } = props as SyncUpdateProps
 
-        if (
-          !knowledgeGroup.technologyId ||
-          !oldKnowledgeGroupId ||
-          knowledgeGroup.technologyId === oldKnowledgeGroupId
-        ) {
-          return
-        }
-
-        await this.removeKnowledgeGroupFromTechnology({
-          knowledgeGroupId: oldKnowledgeGroupId,
-          session,
-          technologyId: knowledgeGroup.technologyId,
-        })
-        await this.addKnowledgeGroupToTechnology({
-          knowledgeGroup,
-          session,
-          technologyId: knowledgeGroup.technologyId,
-        })
+        await this.updateRelatedDocuments({ newKnowledgeGroup, oldKnowledgeGroup, session })
         break
       }
 
       case SyncAction.Delete: {
-        if (!knowledgeGroup.technologyId) {
-          return
-        }
+        const { knowledgeGroup } = props as SyncDeleteProps
 
-        await this.removeKnowledgeGroupFromTechnology({
-          knowledgeGroupId: knowledgeGroup.id,
-          session,
-          technologyId: knowledgeGroup.technologyId,
-        })
+        await this.deleteRelatedDocuments({ knowledgeGroup, session })
         break
       }
     }
+  }
+
+  private async updateRelatedDocuments({
+    newKnowledgeGroup,
+    oldKnowledgeGroup,
+    session = null,
+  }: {
+    newKnowledgeGroup: KnowledgeGroup
+    oldKnowledgeGroup: KnowledgeGroup
+    session?: ClientSession | null
+  }) {
+    if (newKnowledgeGroup.technologyId !== oldKnowledgeGroup.technologyId) {
+      await this.removeKnowledgeGroupFromTechnology({
+        knowledgeGroupId: oldKnowledgeGroup.id,
+        session,
+        technologyId: oldKnowledgeGroup.technologyId,
+      })
+
+      await this.addKnowledgeGroupToTechnology({
+        knowledgeGroup: newKnowledgeGroup,
+        session,
+        technologyId: newKnowledgeGroup.technologyId,
+      })
+    }
+
+    await this.knowledgeItemModel
+      .updateMany(
+        {
+          knowledgeGroupId: oldKnowledgeGroup.id,
+        },
+        {
+          $set: {
+            technologyId: newKnowledgeGroup.id,
+            technologySectionId: newKnowledgeGroup.technologySectionId,
+            technologyType: newKnowledgeGroup.technologyType,
+          },
+        },
+      )
+      .session(session)
+  }
+
+  private async deleteRelatedDocuments({
+    knowledgeGroup,
+    session = null,
+  }: {
+    knowledgeGroup: KnowledgeGroup
+    session?: ClientSession | null
+  }) {
+    await this.removeKnowledgeGroupFromTechnology({
+      knowledgeGroupId: knowledgeGroup.id,
+      session,
+      technologyId: knowledgeGroup.technologyId,
+    })
+    await this.knowledgeItemModel
+      .deleteMany({ knowledgeGroupId: knowledgeGroup.id })
+      .session(session)
   }
 
   private async addKnowledgeGroupToTechnology({
@@ -99,8 +125,10 @@ export class BaseKnowledgeGroupCommand {
   }: {
     knowledgeGroup: KnowledgeGroup
     session?: ClientSession | null
-    technologyId: string
+    technologyId?: string
   }): Promise<void> {
+    if (!technologyId || !knowledgeGroup) return
+
     const technology = await this.technologyModel.findById(technologyId).session(session)
 
     if (!technology) {
@@ -116,10 +144,12 @@ export class BaseKnowledgeGroupCommand {
     session = null,
     technologyId,
   }: {
-    knowledgeGroupId: string
+    knowledgeGroupId?: string
     session?: ClientSession | null
-    technologyId: string
+    technologyId?: string
   }): Promise<void> {
+    if (!technologyId || !knowledgeGroupId) return
+
     const technology = await this.technologyModel.findById(technologyId).session(session)
 
     if (!technology) {
