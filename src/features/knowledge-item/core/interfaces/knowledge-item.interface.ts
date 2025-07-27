@@ -27,9 +27,10 @@ export class KnowledgeItemResponse extends BaseKnowledgeItemResponse {
   technologyId: string
 
   @ApiPropertyOptional({
+    nullable: true,
     type: String,
   })
-  knowledgeGroupId?: string
+  knowledgeGroupId: Maybe<string>
 
   @ApiPropertyOptional({
     nullable: true,

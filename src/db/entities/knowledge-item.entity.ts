@@ -99,10 +99,9 @@ export class KnowledgeItem extends BaseEntity {
   technologyId: string
 
   @Prop({
-    required: true,
     type: String,
   })
-  knowledgeGroupId: string
+  knowledgeGroupId: Maybe<string>
 }
 
 export const KnowledgeItemSchema = SchemaFactory.createForClass(KnowledgeItem)

@@ -130,7 +130,7 @@ export class BaseKnowledgeItemCommand {
     knowledgeItem,
     session = null,
   }: {
-    knowledgeGroupId?: string
+    knowledgeGroupId?: null | string
     knowledgeItem?: KnowledgeItem
     session?: ClientSession | null
   }) {
@@ -155,8 +155,8 @@ export class BaseKnowledgeItemCommand {
     knowledgeItemId,
     session = null,
   }: {
-    knowledgeGroupId?: string
-    knowledgeItemId?: string
+    knowledgeGroupId?: null | string
+    knowledgeItemId?: null | string
     session?: ClientSession | null
   }) {
     if (!knowledgeGroupId || !knowledgeItemId) return

@@ -94,14 +94,15 @@ export class CreateKnowledgeItemInput {
   })
   @IsNotEmpty()
   @IsMongoId()
-  technologyId?: string
+  technologyId: string
 
   @ApiPropertyOptional({
+    nullable: true,
     type: String,
   })
   @IsOptional()
   @IsMongoId()
-  knowledgeGroupId?: string
+  knowledgeGroupId: Maybe<string>
 }
 
 export class CreateKnowledgeItemCommand {
